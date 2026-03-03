@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import { login, type LoginState } from './action'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 
@@ -15,13 +16,16 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow p-8 space-y-6">
 
         {/* Header */}
         <div className="mb-8">
+          <Image src="/nobglogo1.png"
+            alt="GreenSteps Logo"
+            width={100} height={100} />
           <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Sign in to your EcoTrack account
+            Sign in to your GreenSteps account
           </p>
         </div>
 
@@ -97,8 +101,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={pending}
-            className="w-full py-2.5 px-4 bg-green-600 hover:bg-green-700 disabled:bg-green-400
-                       text-white text-sm font-semibold rounded-lg transition-colors"
+            className="w-full py-2.5 px-4 btn btn-ghost"
           >
             {pending ? 'Signing in...' : 'Sign in'}
           </button>

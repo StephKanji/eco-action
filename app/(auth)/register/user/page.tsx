@@ -89,8 +89,7 @@ export default function UserRegisterPage() {
         <button
           type="submit"
           disabled={pending}
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-medium
-                     py-2 rounded-lg text-sm disabled:opacity-50 transition-colors"
+          className="w-full py-2.5 px-4 btn btn-ghost"
         >
           {pending ? 'Creating account...' : 'Create Account'}
         </button>

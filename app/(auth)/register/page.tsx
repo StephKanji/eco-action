@@ -30,8 +30,6 @@ export default function RegisterPage() {
             onClick={() => router.push('/register/user')}
             className="btn btn-primary mt-3">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 translate-y-5 rounded-xl bg-green-50 flex items-center justify-center text-2xl"> 🌱
-              </div>
               <div>
                 <h2 className="font-semibold -translate-x-5 text-gray-900">
                   Individual
@@ -49,11 +47,9 @@ export default function RegisterPage() {
             onClick={() => router.push('/register/organization')}
             className="btn btn-primary mt-3">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 translate-y-5 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition-colors text-2xl"> 🏢
-              </div>
               <div>
                 <h2 className="font-semibold -translate-x-5 text-gray-900">
-                  Organisation
+                  Organization
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
                   Post tasks, run challenges, and engage your community

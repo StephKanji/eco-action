@@ -8,7 +8,7 @@
 @layer base {
   :root {
     --color-primary: rgba(136, 219, 72, 0.758)ef;
-    --color-primary-hover: #571e04bf;
+    --color-primary-hover: #e1c9bebf;
     --color-primary-light: #87b74c;
     /* green-100 */
 
@@ -125,12 +125,12 @@
 
   .btn-ghost {
     background-color: transparent;
-    color: white;
+    color: black;
   }
 
   .btn-ghost:hover:not(:disabled) {
     background-color: var(--color-primary-hover);
-    color: white;
+    color: var(--color-text);
   }
 
   .btn-danger {
@@ -235,7 +235,7 @@
         var(--color-warning) 25%);
     background-clip: text;
     -webkit-background-clip: text;
-    color: transparent;
+    color: black; /* Fallback color */
     -webkit-text-fill-color: transparent;
   }
 

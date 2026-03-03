@@ -123,8 +123,7 @@ export default function RegisterOrganizationPage() {
           <button
             type="submit"
             disabled={pending}
-            className="w-full py-2.5 px-4 bg-green-600 hover:bg-green-700 disabled:bg-green-400
-                       text-white text-sm font-semibold rounded-lg transition-colors"
+            className="w-full py-2.5 px-4 btn btn-ghost"
           >
             {pending ? 'Submitting...' : 'Submit for review'}
           </button>

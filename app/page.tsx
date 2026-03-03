@@ -9,14 +9,14 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Image
-        src="/nobglogo1.png"
+        src="/nobglogo2.png"
         alt="GreenSteps.logo"
-        width={200}
-        height={200}
+        width={250}
+        height={250}
       />
-      <h1 className="page-title">Welcoma to GreenSteps</h1>
+      <h1 className="page-title">Welcome to GreenSteps</h1>
       <p className="page-subtitle">
-        Complete eco-concious task and earn rewards✨💰
+        Complete eco-concious task and earn rewards
       </p>
 
       <div
