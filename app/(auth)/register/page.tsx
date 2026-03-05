@@ -13,12 +13,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
 
         <div className="text-center mb-8">
-          <Image
-            src="/nobglogo2.png"
-            alt="greenspoonlogo.png"
-            width={200}
-            height={200}
-          />
+      
 
           <p className="page-subtitle mt-1">Choose how you want to participate</p>
         </div>
