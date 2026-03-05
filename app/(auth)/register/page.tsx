@@ -20,7 +20,7 @@ export default function RegisterPage() {
             height={200}
           />
 
-          <p className="text-sm text-gray-500 mt-1">Choose how you want to participate</p>
+          <p className="page-subtitle mt-1">Choose how you want to participate</p>
         </div>
         <div className="grid gap-4">
           {/* User card */}

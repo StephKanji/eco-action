@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -47,6 +48,9 @@ export default function ForgotPasswordPage() {
         ) : (
           <>
             <div className="mb-8">
+              <Image src="/nobglogo1.png"
+                alt="GreenSteps Logo"
+                width={100} height={100} />
               <h1 className="text-2xl font-bold text-gray-900">Reset your password</h1>
               <p className="text-sm text-gray-500 mt-1">
                 Enter your email and we'll send you a reset link
@@ -74,16 +78,14 @@ export default function ForgotPasswordPage() {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="jane@example.com"
                   required
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 text-sm
-                             focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="input"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={pending || !email}
-                className="w-full py-2.5 px-4 bg-green-600 hover:bg-green-700 disabled:bg-green-400
-                           text-white text-sm font-semibold rounded-lg transition-colors"
+                className="btn btn-ghost w-full"
               >
                 {pending ? 'Sending...' : 'Send reset link'}
               </button>

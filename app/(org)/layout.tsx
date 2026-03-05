@@ -1,19 +1,47 @@
-import { redirect } from "next/navigation";
-import { createClient } from "../../supabase/server";
+// app/(org)/layout.tsx
+import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { redirect } from 'next/navigation'
 
 export default async function OrgLayout({
   children,
 }: {
-  children: React.ReactNode;
-}): Promise<React.ReactElement> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  children: React.ReactNode
+}) {
+  const supabase = await createClient()
 
-  if (!user) redirect("/login");
+  const { data: { user } } = await supabase.auth.getUser()
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="container mx-auto px-4 py-8">{children}</main>
-    </div>
-  );
+  if (!user) {
+    redirect('/login')
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'org') {
+    redirect('/login')
+  }
+
+  // Check approval status
+  const adminClient = createAdminClient()
+
+  const { data: org } = await adminClient
+    .from('organizations')
+    .select('verification_status')
+    .eq('profile_id', user.id)
+    .single()
+
+  if (org?.verification_status === 'pending') {
+    redirect('/register/organization/pending')
+  }
+
+  if (org?.verification_status === 'rejected') {
+    redirect('/register/organization/rejected')
+  }
+
+  return <>{children}</>
 }

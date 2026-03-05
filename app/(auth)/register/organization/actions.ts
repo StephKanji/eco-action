@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
@@ -41,71 +40,62 @@ export async function registerOrganization(
     return { errors: validated.error.flatten().fieldErrors }
   }
 
-  const { org_name, contact_email, kra_pin, description, password } =
-    validated.data
+  const { org_name, contact_email, kra_pin, description, password } = validated.data
+  const supabase = await createClient()
 
-  const adminClient = createAdminClient()
+  // in registerOrganization
+console.log('🔗 org emailRedirectTo:', `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?type=org`)
 
-  // 1. Create auth user via admin — fully synchronous, no timing issues
-  const { data: authData, error: authError } =
-    await adminClient.auth.admin.createUser({
-      email: contact_email,
-      password,
-      email_confirm: true, // skip email confirmation for orgs
-      user_metadata: { display_name: org_name },
-    })
 
-  if (authError) {
-    if (authError.message.includes('already registered')) {
+  const { data, error } = await supabase.auth.signUp({
+    email: contact_email,
+    password,
+    options: {
+      data: { display_name: org_name, kra_pin, description },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?type=org`,
+    },
+  })
+
+  if (error) {
+    if (error.message.toLowerCase().includes('already registered')) {
       return { errors: { contact_email: ['This email is already registered'] } }
     }
-    return { errors: { general: [authError.message] } }
+    return { errors: { general: [error.message] } }
   }
 
-  if (!authData.user) {
-    return { errors: { general: ['Failed to create account. Please try again.'] } }
-  }
+  // Session exists = email confirmations disabled (dev only)
+  // Profile + org rows are created here since callback won't be hit via email link
+  if (data.session && data.user) {
+    const { createAdminClient } = await import('@/lib/supabase/admin')
+    const adminClient = createAdminClient()
 
-  const userId = authData.user.id
+    const userId = data.user.id
 
-  // 2. Upsert profiles row with role = 'org'
-  // auth user is fully committed so FK constraint will pass
-  const { error: profileError } = await adminClient
-    .from('profiles')
-    .upsert(
-      {
-        id: userId,
-        role: 'org' as const,
-        display_name: org_name,
-      },
-      { onConflict: 'id' }
-    )
+    const { error: profileError } = await adminClient
+      .from('profiles')
+      .insert({ id: userId, role: 'org', display_name: org_name })
 
-  if (profileError) {
-    // Clean up auth user if profile fails
-    await adminClient.auth.admin.deleteUser(userId)
-    return { errors: { general: [profileError.message] } }
-  }
-
-  // 3. Insert organizations row
-  const { error: orgError } = await adminClient
-    .from('organizations')
-    .insert({
-      profile_id: userId,
-      org_name,
-      contact_email,
-      kra_pin,
-      description: description ?? null,
-    })
-
-  if (orgError) {
-    // Clean up both rows if org insert fails
-    await adminClient.auth.admin.deleteUser(userId)
-    if (orgError.code === '23505') {
-      return { errors: { kra_pin: ['This KRA PIN is already registered'] } }
+    if (profileError && profileError.code !== '23505') {
+      return { errors: { general: [profileError.message] } }
     }
-    return { errors: { general: [orgError.message] } }
+
+    const { error: orgError } = await adminClient
+      .from('organizations')
+      .insert({
+        profile_id: userId,
+        org_name,
+        contact_email,
+        kra_pin,
+        description: description ?? null,
+      })
+
+    if (orgError && orgError.code !== '23505') {
+      return { errors: { general: [orgError.message] } }
+    }
+
+    redirect('/register/organization/pending')
   }
 
-  redirect('/login?message=Registration submitted. Await admin approval.')
+  // Normal flow — email confirmation required
+  redirect('/register/organization/verify-email')
 }

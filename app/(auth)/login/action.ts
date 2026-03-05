@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
@@ -21,7 +22,6 @@ export async function login(
   _prevState: LoginState,
   formData: FormData
 ): Promise<LoginState> {
-  // 1. Validate inputs
   const validated = LoginSchema.safeParse({
     email: formData.get('email'),
     password: formData.get('password'),
@@ -34,7 +34,6 @@ export async function login(
   const { email, password } = validated.data
   const supabase = await createClient()
 
-  // 2. Sign in
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -48,7 +47,6 @@ export async function login(
     return { errors: { general: ['Login failed. Please try again.'] } }
   }
 
-  // 3. Fetch role to redirect to correct dashboard
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
@@ -57,10 +55,40 @@ export async function login(
 
   const role = profile?.role ?? 'user'
 
-  const ROLE_DASHBOARDS = {
-    user: '/user/dashboard',
-    org: '/org/overview',
-    admin: '/admin/dashboard',
+  // Guard org accounts before redirecting
+  if (role === 'org') {
+    const adminClient = createAdminClient()
+
+    const { data: org } = await adminClient
+      .from('organizations')
+      .select('verification_status')
+      .eq('profile_id', data.user.id)
+      .single()
+
+    if (org?.verification_status === 'pending') {
+      // Sign them back out — don't leave an active session
+      await supabase.auth.signOut()
+      return {
+        errors: {
+          general: ['Your organisation is pending approval. You will be notified by email.'],
+        },
+      }
+    }
+
+    if (org?.verification_status === 'rejected') {
+      await supabase.auth.signOut()
+      return {
+        errors: {
+          general: ['Your organisation registration was not verified. Please contact support.'],
+        },
+      }
+    }
+  }
+
+  const ROLE_DASHBOARDS: Record<string, string> = {
+    user: '/profile',
+    org: '/overview',
+    admin: '/dashboards',
   }
 
   redirect(ROLE_DASHBOARDS[role])

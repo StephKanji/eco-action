@@ -1,40 +1,87 @@
 'use client'
 
-import { useActionState } from 'react'
-import { registerUser, type RegisterUserState } from './action'
+import { useState } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-
-const initialState: RegisterUserState = {}
+import Image from 'next/image'
 
 export default function UserRegisterPage() {
-  const [state, formAction, pending] = useActionState(registerUser, initialState)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [pending, setPending] = useState(false)
+  const router = useRouter()
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setPending(true)
+    setErrors({})
+
+    const form = new FormData(e.currentTarget)
+    const display_name = form.get('display_name') as string
+    const email = form.get('email') as string
+    const password = form.get('password') as string
+
+    if (display_name.length < 2) {
+      setErrors({ display_name: 'Name must be at least 2 characters' })
+      setPending(false)
+      return
+    }
+    if (password.length < 8) {
+      setErrors({ password: 'Password must be at least 8 characters' })
+      setPending(false)
+      return
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { display_name },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+
+    if (error) {
+      setErrors({ general: error.message })
+      setPending(false)
+      return
+    }
+
+    if (data.session) {
+      router.push('/profile')
+      return
+    }
+
+    router.push('/register/user/verify-email')
+  }
 
   return (
     <div className="w-full max-w-md bg-white rounded-2xl shadow p-8 space-y-6">
       <div>
-        <Link
-          href="/register"
-          className="text-xs text-gray-400 hover:text-gray-600 mb-4 inline-block"
-        >
-          ← Back
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <div className="flex">
+          <Image src="/nobglogo1.png" alt="greenspoon.logo" width={100} height={100} />
+          <h1 className="page-title">Create your account</h1>
+        </div>
+        <p className="page-subtitle mt-1">
           Already have an account?{' '}
-          <Link href="/login" className="text-green-600 hover:underline">
+          <Link href="/login" className="text-brown-600 hover:underline">
             Sign in
           </Link>
         </p>
       </div>
 
-      {/* General error */}
-      {state.errors?.general && (
+      {errors.general && (
         <div className="p-3 rounded-lg bg-red-50 border border-red-200">
-          <p className="text-sm text-red-600">{state.errors.general[0]}</p>
+          <p className="text-sm text-red-600">{errors.general}</p>
         </div>
       )}
 
-      <form action={formAction} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Display Name
@@ -44,11 +91,10 @@ export default function UserRegisterPage() {
             type="text"
             required
             placeholder="Jane Doe"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="input"
           />
-          {state.errors?.display_name && (
-            <p className="mt-1 text-xs text-red-500">{state.errors.display_name[0]}</p>
+          {errors.display_name && (
+            <p className="mt-1 text-xs text-red-500">{errors.display_name}</p>
           )}
         </div>
 
@@ -60,12 +106,11 @@ export default function UserRegisterPage() {
             name="email"
             type="email"
             required
-            placeholder="jane@example.com"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="username@example.com"
+            className="input"
           />
-          {state.errors?.email && (
-            <p className="mt-1 text-xs text-red-500">{state.errors.email[0]}</p>
+          {errors.email && (
+            <p className="mt-1 text-xs text-red-500">{errors.email}</p>
           )}
         </div>
 
@@ -78,11 +123,10 @@ export default function UserRegisterPage() {
             type="password"
             required
             placeholder="Min. 8 characters"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="input"
           />
-          {state.errors?.password && (
-            <p className="mt-1 text-xs text-red-500">{state.errors.password[0]}</p>
+          {errors.password && (
+            <p className="mt-1 text-xs text-red-500">{errors.password}</p>
           )}
         </div>
 
