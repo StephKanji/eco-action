@@ -11,6 +11,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white rounded-xl shadow p-8 w-full max-w-md">
+<Image src="/nobglogo1" alt="greensteps" height={50} width={50}/>
         <h1 className="text-2xl font-bold mb-6 text-gray-800">Sign In</h1>
 
         <form action={formAction} className="space-y-4">
@@ -51,7 +52,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={pending}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg text-sm disabled:opacity-50"
+            className="w-full bt btn-ghost"
           >
             {pending ? 'Signing in...' : 'Sign In'}
           </button>
