@@ -1,64 +1,53 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-
 
 export default function RegisterPage() {
   const router = useRouter()
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md">
+    <div>
+      <section className="hero-section">
 
-        <div className="text-center mb-8">
-      
+        <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', marginBottom: '8px' }}>
+          How will you <em>make an impact?</em>
+        </h1>
 
-          <p className="page-subtitle mt-1">Choose how you want to participate</p>
-        </div>
-        <div className="grid gap-4">
-          {/* User card */}
+        <p className="hero-subtitle" style={{ marginBottom: '32px' }}>
+          Choose how you want to participate in the green movement.
+        </p>
 
-          <button
-            type="button"
-            onClick={() => router.push('/register/user')}
-            className="btn btn-primary mt-3">
-            <div className="flex items-start gap-4">
-              <div>
-                <h2 className="font-semibold -translate-x-5 text-gray-900">
-                  Individual
-                </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  Complete eco tasks, earn points, and redeem rewards
-                </p>
-              </div>
-            </div>
-          </button>
+        {/* Choice cards */}
+        <div >
+          <div className="flex gap-4">
+            <button className="btn-ghost" onClick={() => router.push('/register/user')}>
+              <div className="hero-subtitle" style={{ marginBottom: '8px' }}>Individual</div>
+              <p >
+                Complete eco tasks, earn points, and redeem rewards on your personal journey.
+              </p>
+              <div className="register-choice-cta">Get started</div>
+            </button>
+            <button className="btn-ghost" onClick={() => router.push('/register/organization')}>
+              <div className="hero-subtitle" style={{ marginBottom: '8px' }}>Organization</div>
+              <p style={{ marginBottom: '16px' }}>
+                Post tasks, run challenges, and engage your community at scale.
+              </p>
+              <div className="register-choice-cta">Get started</div>
+            </button>
+          </div>
 
-          {/* Org card */}
-          <button
-            type="button"
-            onClick={() => router.push('/register/organization')}
-            className="btn btn-primary mt-3">
-            <div className="flex items-start gap-4">
-              <div>
-                <h2 className="font-semibold -translate-x-5 text-gray-900">
-                  Organization
-                </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  Post tasks, run challenges, and engage your community
-                </p> </div> </div>
-          </button>
+
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="hero-proof-text" style={{ marginTop: '32px', textAlign: 'center' }}>
           Already have an account?{' '}
-          <Link href="/login" className="text-green-600 font-medium hover:underline">
+          <Link href="/login" style={{ color: 'var(--hero-green-mid)', fontWeight: 500 }}>
             Sign in
           </Link>
         </p>
-      </div>
+
+      </section>
     </div>
   )
 }

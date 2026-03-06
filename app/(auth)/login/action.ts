@@ -66,7 +66,8 @@ export async function login(
       .single()
 
     if (org?.verification_status === 'pending') {
-      // Sign them back out — don't leave an active session
+
+    
       await supabase.auth.signOut()
       return {
         errors: {

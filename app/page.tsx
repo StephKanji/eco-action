@@ -1,41 +1,63 @@
 'use client'
 
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { Navbar } from '@/components/navbar'
+
 
 export default function Home() {
   const router = useRouter()
+  const [activeStep, setActiveStep] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveStep(prev => (prev + 1) % 3)
+    }, 2000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
-    <main className="flex min-h-screen items-center justify-center my-1 -translate-y-10">
-      {/* Two-column layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-6xl">
-        
-        {/* Left column: text content */}
-        <div className="flex flex-col justify-center">
-          <p className="page-subtitle">Welcome to GreenSteps</p>
-          <p className="page-subtitle">
-            Complete eco-conscious tasks and earn rewards.
-            create commmunity, and make a positive impact on the planet. Join us today and take your first step towards a greener future!
-          </p>
+    <div>
+      <Navbar />
+
+      {/* Hero section */}
+      <section className="hero-section">
+
+        <h1 className="hero-title">
+          Every step you take<br />
+          <em>heals the planet.</em>
+        </h1>
+
+        <p className="hero-subtitle">
+          Complete eco-conscious tasks, earn rewards, and join a community of
+          changemakers making a real difference — one green step at a time.
+        </p>
+
+
+        {/* CTA */}
+        <div className="hero-cta-row">
+          <button
+            className="hero-btn-primary"
+            onClick={() => router.push('/register')}
+          >
+            Start Your Journey →
+          </button>
+  
         </div>
 
-        {/* Right column: image + button */}
-        <div className="flex flex-col items-center justify-center">
-          <Image
-            src="/nobglogo2.png"
-            alt="GreenSteps.logo"
-            width={200}
-            height={200}
-          />
-          <button
-            onClick={() => router.push('/register')}
-            className="btn btn-outline mt-6"
-          >
-            Register Now
-          </button>
+        {/* Social proof */}
+        <div className="hero-social-proof">
+          <div className="hero-avatar-stack">
+            <div className="hero-avatar hero-avatar-1">A</div>
+            <div className="hero-avatar hero-avatar-2">B</div>
+            <div className="hero-avatar hero-avatar-3">C</div>
+            <div className="hero-avatar hero-avatar-4">D</div>
+          </div>
+          <p className="hero-proof-text">
+            Join <strong>2,400+</strong> eco-warriors already making a difference
+          </p>
         </div>
-      </div>
-    </main>
+      </section>
+    </div>
   )
 }

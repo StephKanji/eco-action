@@ -37,8 +37,8 @@ export default async function OrganizationsPage() {
 
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Organisations</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', marginBottom: '8px' }}>Admin Dashboard</h1>
+        <p className="hero-subtitle">
           Review and approve organisation registrations
         </p>
       </div>
@@ -61,9 +61,9 @@ export default async function OrganizationsPage() {
 
       {/* Pending section */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-4">
           <span className="w-2 h-2 rounded-full bg-yellow-400 inline-block" />
-          Pending Approval
+          Pending Review
         </h2>
 
         {pending.length === 0 ? (

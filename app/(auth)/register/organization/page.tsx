@@ -22,11 +22,11 @@ export default function RegisterOrganizationPage() {
     setErrors({})
 
     const form = new FormData(e.currentTarget)
-    const org_name      = form.get('org_name') as string
+    const org_name = form.get('org_name') as string
     const contact_email = form.get('contact_email') as string
-    const kra_pin       = form.get('kra_pin') as string
-    const description   = form.get('description') as string
-    const password      = form.get('password') as string
+    const kra_pin = form.get('kra_pin') as string
+    const description = form.get('description') as string
+    const password = form.get('password') as string
 
     if (org_name.length < 2) {
       setErrors({ org_name: 'Organisation name must be at least 2 characters' })
@@ -62,7 +62,7 @@ export default function RegisterOrganizationPage() {
     // Email confirmations disabled (dev) — session returned immediately
     // Create profile + org rows via API route using admin client
     if (data.session && data.user) {
-      const res = await fetch('/api/send-org-email', {
+      const res = await fetch('/api/register-org', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -90,14 +90,12 @@ export default function RegisterOrganizationPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+    <div className="hero-section">
 
-        <div className="mb-8">
-          <Image src="/nobglogo2.png" alt="greenSpoon.logo" width={50} height={50} />
-          <h1 className="page-title">Register your organisation</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Submit for admin review. You'll be notified once verified.
+          <div className="mb-8">
+          <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', marginBottom: '8px' }}>Register your organisation</h1>
+          <p className="hero-subtitle">
+            Submit your details for admin review. You'll be notified once verified.
           </p>
         </div>
 
@@ -109,7 +107,7 @@ export default function RegisterOrganizationPage() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="org_name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="org_name" className="input-label">
               Organisation name
             </label>
             <input
@@ -125,7 +123,7 @@ export default function RegisterOrganizationPage() {
           </div>
 
           <div>
-            <label htmlFor="contact_email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="contact_email" className="input-label">
               Contact email
             </label>
             <input
@@ -141,7 +139,7 @@ export default function RegisterOrganizationPage() {
           </div>
 
           <div>
-            <label htmlFor="kra_pin" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="kra_pin" className="input-label">
               KRA PIN
             </label>
             <input
@@ -158,7 +156,7 @@ export default function RegisterOrganizationPage() {
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="description" className="input-label">
               Description{' '}
               <span className="text-gray-400 font-normal">(optional)</span>
             </label>
@@ -172,7 +170,7 @@ export default function RegisterOrganizationPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="password" className="input-label">
               Password
             </label>
             <input
@@ -192,7 +190,7 @@ export default function RegisterOrganizationPage() {
             disabled={pending}
             className="w-full py-2.5 px-4 btn btn-ghost"
           >
-            {pending ? 'Submitting...' : 'Submit for review'}
+            {pending ? 'Submitting...' : ' Create account'}
           </button>
         </form>
 
@@ -204,7 +202,6 @@ export default function RegisterOrganizationPage() {
             </Link>
           </p>
         </div>
-      </div>
     </div>
   )
 }

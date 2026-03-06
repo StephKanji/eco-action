@@ -61,13 +61,12 @@ export default function UserRegisterPage() {
   }
 
   return (
-    <div className="w-full max-w-md bg-white rounded-2xl shadow p-8 space-y-6">
+    <div className="hero-section">
       <div>
         <div className="flex">
-          <Image src="/nobglogo1.png" alt="greenspoon.logo" width={100} height={100} />
-          <h1 className="page-title">Create your account</h1>
+          <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', marginBottom: '8px' }}>Create your account</h1>
         </div>
-        <p className="page-subtitle mt-1">
+        <p className="hero-subtitle mt-1">
           Already have an account?{' '}
           <Link href="/login" className="text-brown-600 hover:underline">
             Sign in
@@ -145,6 +144,7 @@ export default function UserRegisterPage() {
           Register here
         </Link>
       </p>
+
     </div>
   )
 }

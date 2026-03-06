@@ -1,84 +1,46 @@
-import { createAdminClient } from '@/lib/supabase/admin'
 import { NextRequest, NextResponse } from 'next/server'
+import nodemailer from 'nodemailer'
+
+const transporter = nodemailer.createTransport({
+  host: process.env.MAIL_HOST,
+  port: Number(process.env.MAIL_PORT),
+  auth: { user: process.env.MAIL_USER, pass: process.env.MAIL_PASS },
+})
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, org_name, contact_email, kra_pin, description } = await req.json()
+    const { to, org_name, approved, reason } = await req.json()
 
-    if (!userId || !org_name || !contact_email || !kra_pin) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-    }
-
-    const adminClient = createAdminClient()
-
-    // Idempotency — skip if profile already exists
-    const { data: existing } = await adminClient
-      .from('profiles')
-      .select('id')
-      .eq('id', userId)
-      .single()
-
-    if (!existing) {
-      const { error: profileError } = await adminClient
-        .from('profiles')
-        .insert({ id: userId, role: 'org', display_name: org_name })
-
-      if (profileError) {
-        console.error('profile insert failed:', profileError.message)
-        return NextResponse.json({ error: profileError.message }, { status: 500 })
-      }
-    }
-
-    // Idempotency — skip if org already exists
-    const { data: existingOrg } = await adminClient
-      .from('organizations')
-      .select('id')
-      .eq('profile_id', userId)
-      .single()
-
-    if (!existingOrg) {
-      const { error: orgError } = await adminClient
-        .from('organizations')
-        .insert({
-          profile_id:    userId,
-          org_name,
-          contact_email,
-          kra_pin,
-          description:   description ?? null,
-        })
-
-      if (orgError) {
-        console.error('org insert failed:', orgError.message)
-        return NextResponse.json({ error: orgError.message }, { status: 500 })
-      }
-
-      // Generate approval token
-      const { data: tokenData, error: tokenError } = await adminClient
-        .from('approval_tokens')
-        .insert({ org_id: userId })
-        .select('token')
-        .single()
-
-      if (!tokenError && tokenData) {
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
-        await fetch(`${baseUrl}/api/send-admin-email`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            org_name,
-            contact_email,
-            kra_pin,
-            description: description ?? '',
-            approveUrl: `${baseUrl}/api/admin/review?token=${tokenData.token}&action=approve`,
-            rejectUrl:  `${baseUrl}/api/admin/review?token=${tokenData.token}&action=reject`,
-          }),
-        })
-      }
-    }
+    await transporter.sendMail({
+      from: `"EcoTrack" <no-reply@ecotrack.com>`,
+      to,
+      subject: approved
+        ? 'Your organisation has been approved'
+        : 'Your organisation registration was not approved',
+      html: approved
+        ? `
+          <div style="font-family:sans-serif;max-width:600px;margin:auto;">
+            <h2>Welcome, ${org_name}!</h2>
+            <p>Your organisation has been <strong style="color:#16a34a;">approved</strong>.</p>
+            <a href="${process.env.NEXT_PUBLIC_SITE_URL}/login"
+              style="padding:12px 24px;background:#16a34a;color:white;text-decoration:none;border-radius:6px;display:inline-block;margin-top:16px;">
+              Log In Now
+            </a>
+          </div>
+        `
+        : `
+          <div style="font-family:sans-serif;max-width:600px;margin:auto;">
+            <h2>Registration Update</h2>
+            <p>Unfortunately <strong>${org_name}</strong> was not approved at this time.</p>
+            ${reason ? `<p><strong>Reason:</strong> ${reason}</p>` : ''}
+            <p>If you believe this is an error, please contact support.</p>
+          </div>
+        `,
+    })
 
     return NextResponse.json({ ok: true })
   } catch (err) {
-    console.error('register-org error:', err)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('send-org-email error:', err)
+    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
   }
 }

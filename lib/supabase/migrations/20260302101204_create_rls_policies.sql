@@ -7,6 +7,11 @@ create policy "profiles: select own"
   on public.profiles for select
   using (auth.uid() = id);
 
+-- Users can insert their own profile
+create policy "profiles: insert own"
+  on public.profiles for insert
+  with check (auth.uid() = id);
+
 -- Users can update only their own profile
 create policy "profiles: update own"
   on public.profiles for update

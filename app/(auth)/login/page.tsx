@@ -9,10 +9,39 @@ export default function LoginPage() {
   const [state, formAction, pending] = useActionState(login, initialState)
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white rounded-xl shadow p-8 w-full max-w-md">
-        <Image src="/nobglogo1.png" alt="greensteps" height={50} width={50} />
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">Sign In</h1>
+<div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
+
+    {/* Background video */}
+    <video
+      src="/heroclip.mp4"
+      autoPlay
+      loop
+      muted
+      playsInline
+      style={{
+        position: 'fixed',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        zIndex: 0,
+      }}
+    />
+
+    {/* Dark overlay so text stays readable */}
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      background: 'rgba(121, 189, 133, 0.71)',
+      zIndex: 1,
+    }} />
+
+    <div className="hero-section">
+  
+        <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', marginBottom: '8px' }}>
+          Login To Your Account<br />
+          <em>let's heal the planet.</em>
+        </h1>
 
         <form action={formAction} className="space-y-4">
           {state.errors?.general && (
@@ -22,13 +51,13 @@ export default function LoginPage() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="input-label">
               Email
             </label>
             <input
               name="email"
               type="email"
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="input"
             />
             {state.errors?.email && (
               <p className="text-xs text-red-500 mt-1">{state.errors.email[0]}</p>
@@ -36,13 +65,13 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="input-label">
               Password
             </label>
             <input
               name="password"
               type="password"
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="input"
             />
             {state.errors?.password && (
               <p className="text-xs text-red-500 mt-1">{state.errors.password[0]}</p>
@@ -52,12 +81,13 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={pending}
-            className="w-full bt btn-ghost"
+            className="w-full btn btn-ghost"
           >
             {pending ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-      </div>
+      
+    </div>
     </div>
   )
 }
