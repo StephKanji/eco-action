@@ -1,7 +1,7 @@
-// app/(org)/layout.tsx
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
+import { Navbar } from '@/components/navbar'
 
 export default async function OrgLayout({
   children,
@@ -9,12 +9,9 @@ export default async function OrgLayout({
   children: React.ReactNode
 }) {
   const supabase = await createClient()
-
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
-  }
+  if (!user) redirect('/login')
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -22,11 +19,8 @@ export default async function OrgLayout({
     .eq('id', user.id)
     .single()
 
-  if (profile?.role !== 'org') {
-    redirect('/login')
-  }
+  if (profile?.role !== 'org') redirect('/login')
 
-  // Check approval status
   const adminClient = createAdminClient()
 
   const { data: org } = await adminClient
@@ -43,5 +37,10 @@ export default async function OrgLayout({
     redirect('/register/organization/rejected')
   }
 
-  return <>{children}</>
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  )
 }

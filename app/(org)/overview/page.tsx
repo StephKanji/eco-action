@@ -45,20 +45,17 @@ export default async function OrgOverviewPage() {
   })
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-2xl mx-auto px-4 py-8 space-y-5">
+    
+    <div >
+      <div className="max-w-4xl mx-auto pt-40 space-y-6">
 
         {/* Header card */}
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+        <div className="card">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-green-600 flex items-center 
-                            justify-center text-white text-2xl font-bold shrink-0">
-              {org.org_name[0].toUpperCase()}
-            </div>
+            
+          
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-bold text-gray-900 truncate">
-                {org.org_name}
-              </h1>
+              
               <p className="text-xs text-gray-400 mt-0.5">Since {memberSince}</p>
             </div>
             <span className={`text-xs font-medium px-3 py-1 rounded-full shrink-0 ${status.color}`}>
@@ -71,11 +68,19 @@ export default async function OrgOverviewPage() {
               {org.description}
             </p>
           )}
+
+          {/* Contact */}
+        <div >
+          <p className="text-xs text-gray-400 mt-0.5">
+            Contact Email
+          </p>
+          <p className="text-sm text-gray-800">{org.contact_email}</p>
+        </div>
         </div>
 
         {/* Pending notice */}
         {org.verification_status === 'pending' && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+          <div className="card">
             <p className="text-sm font-medium text-yellow-800">
               ⏳ Awaiting admin approval
             </p>
@@ -85,97 +90,65 @@ export default async function OrgOverviewPage() {
           </div>
         )}
 
-        {/* Points summary — only if verified */}
-        {isVerified && (
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
-              <p className="text-xs text-gray-400 mb-1">Available Points</p>
-              <p className="text-2xl font-bold text-green-600">
-                {org.points_balance.toLocaleString()}
-              </p>
-            </div>
-            <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
-              <p className="text-xs text-gray-400 mb-1">In Escrow</p>
-              <p className="text-2xl font-bold text-orange-500">
-                {org.escrow_balance.toLocaleString()}
-              </p>
-            </div>
-          </div>
-        )}
+      
 
         {/* Stats row — only if verified */}
         {isVerified && (
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm 
-                            flex items-center gap-3">
-              <span className="text-2xl">📋</span>
+            <div className="card">
               <div>
                 <p className="text-xl font-bold text-gray-900">{totalTasks ?? 0}</p>
                 <p className="text-xs text-gray-400">Active Tasks</p>
-              </div>
-            </div>
-            <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm 
-                            flex items-center gap-3">
-              <span className="text-2xl">⏳</span>
-              <div>
-                <p className="text-xl font-bold text-gray-900">{pendingReviews ?? 0}</p>
+                 <p className="text-xl font-bold text-gray-900">{pendingReviews ?? 0}</p>
                 <p className="text-xs text-gray-400">Pending Reviews</p>
+              <p className="text-xl font-bold text-gray-900">
+                {org.points_balance.toLocaleString()}
+              </p>
+              <p className="text-xs text-gray-400">Available Points</p>
+              
+              <p className="text-xl font-bold text-gray-900">
+                {org.escrow_balance.toLocaleString()}
+              </p>
+              <p className="text-xs text-gray-400">In Escrow</p>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Action buttons — only if verified */}
-        {isVerified && (
-          <div className="space-y-3">
-            <Link
+            <div>
+              <div className="space-y-3">
+                <Link
               href="/tasks/new"
-              className="flex items-center justify-between w-full px-5 py-4 
-                         rounded-2xl bg-green-600 text-white font-semibold 
-                         hover:bg-green-700 transition-colors shadow-sm"
+              className="card-strong"
             >
               <div className="flex items-center gap-3">
-                <span className="text-xl">🌱</span>
                 <div className="text-left">
                   <p className="font-semibold">Create New Task</p>
-                  <p className="text-xs text-green-200 font-normal">
+                  <p className="text-xs font-normal">
                     Post an eco task for users
                   </p>
                 </div>
               </div>
-              <span className="text-green-200">→</span>
             </Link>
-
             <Link
               href="/submissions"
-              className="flex items-center justify-between w-full px-5 py-4 
-                         rounded-2xl bg-white border border-gray-100 text-gray-900 
-                         font-semibold hover:border-green-300 hover:bg-green-50 
-                         transition-colors shadow-sm"
+              className="card-strong
+            "
             >
               <div className="flex items-center gap-3">
-                <span className="text-xl">📥</span>
                 <div className="text-left">
                   <p className="font-semibold">Review Submissions</p>
-                  <p className="text-xs text-gray-400 font-normal">
+                  <p className="text-xsfont-normal">
                     {pendingReviews
                       ? `${pendingReviews} awaiting your review`
                       : 'No pending reviews'}
                   </p>
                 </div>
               </div>
-              <span className="text-gray-300">→</span>
             </Link>
+            </div>
+            </div>
           </div>
         )}
 
-        {/* Contact */}
-        <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">
-            Contact Email
-          </p>
-          <p className="text-sm text-gray-800">{org.contact_email}</p>
-        </div>
+        
 
       </div>
     </div>

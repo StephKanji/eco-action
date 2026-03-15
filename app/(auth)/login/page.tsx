@@ -37,7 +37,7 @@ export default function LoginPage() {
       zIndex: 1,
     }} />
 
-    <div className="hero-section" style={{ paddingTop: '0px' }}>
+    <div className='hero-section'>
   
         <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', marginBottom: '8px' }}>
           Login To Your Account<br />

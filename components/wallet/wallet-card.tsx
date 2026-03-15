@@ -35,17 +35,17 @@ export function WalletCard({ userId }: WalletCardProps) {
   const prevThreshold = [0, 0, 1000, 5000, 15000, 40000][wallet.tier_id] ?? 0
   const progressPercent = wallet.tier_id === 5 ? 100 : Math.min(
     ((wallet.lifetime_points - prevThreshold) /
-     (nextThreshold - prevThreshold)) * 100,
+      (nextThreshold - prevThreshold)) * 100,
     100
   )
 
   return (
-    <div className=" p-6 space-y-5">
+    <div className='items-center justify-center text-center'>
 
       {/* Tier badge */}
-      <div className="flex items-center justify-between">
+      <div >
         <div
-          className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold text-white"
+          className="flex items-center gap-2 w-max text-white"
           style={{ backgroundColor: wallet.tier_color }}
         >
           <Star className="w-3 h-3" />
@@ -64,7 +64,6 @@ export function WalletCard({ userId }: WalletCardProps) {
           Available Points
         </p>
         <div className="flex items-end gap-2">
-          <Coins className="w-6 h-6 text-yellow-500 mb-0.5" />
           <span className="text-3xl font-bold text-gray-900">
             {wallet.current_points.toLocaleString()}
           </span>

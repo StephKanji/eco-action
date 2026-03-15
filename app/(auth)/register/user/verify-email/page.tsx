@@ -2,12 +2,14 @@ import Link from 'next/link'
 
 export default function VerifyEmailPage() {
   return (
-    <div className="w-full max-w-md bg-white rounded-2xl shadow p-8 text-center space-y-4">
-      <div className="text-4xl">📧</div>
-      <h1 className="text-2xl font-bold text-gray-900">Check your email</h1>
-      <p className="text-sm text-gray-500">
-        We sent a confirmation link to your email. Click it to activate your
-        account.
+    <div className="card">
+    <div>
+      <h1 className="hero-title" style={{fontSize:'clamp(1.6rem, 3vw, 3.0rem)', marginBottom:'8px'}} >Account created <em> successfully</em></h1>
+      <p className="hero-subtitle">
+        Login to your account and gain rewards for eco-consious activities
+      </p>
+      <p className="hero-subtitle">
+        Individual Action Matters
       </p>
       <Link
         href="/login"
@@ -15,6 +17,7 @@ export default function VerifyEmailPage() {
       >
         Back to sign in
       </Link>
+    </div>
     </div>
   )
 }

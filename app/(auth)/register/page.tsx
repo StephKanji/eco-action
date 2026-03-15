@@ -2,15 +2,13 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Navbar } from '@/components/navbar'
 
 export default function RegisterPage() {
   const router = useRouter()
 
   return (
     <div>
-      <Navbar/>
-      <section className="w-full hero-root hero-section">
+      <section className=" hero-root hero-section">
 
         <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', marginBottom: '8px' }}>
           How will you <em>make an impact?</em>

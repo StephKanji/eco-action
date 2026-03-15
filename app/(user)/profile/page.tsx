@@ -44,7 +44,7 @@ export default async function ProfilePage() {
     name: (b.badges as any).name,
     description: (b.badges as any).description,
     icon: (b.badges as any).icon,
-  }))  
+  }))
 
   const { data: submissions } = await adminClient
     .from('task_submissions')
@@ -76,47 +76,26 @@ export default async function ProfilePage() {
 
   return (
     <div>
-      <div className="profile-streak-row mb-5">
+      <div className="card mt-50 space-x-15 items-center ">
 
         {/* ── Hero Header ── */}
         <div >
           <div aria-hidden="true" />
 
-          {/* Avatar */}
-          <div className="profile-avatar-ring">
-            <div className="profile-avatar">
-              {initial}
-            </div>
+          <div className="flex-1 min-w-0">
+
+            <p className="text-xs text-gray-400 mt-0.5">Since {memberSince}</p>
           </div>
-
-          {/* Name & tier */}
-          <h1 className="profile-name">
-            {profile?.display_name ?? 'User'}
-          </h1>
-
-          <div className={`profile-tier-badge ${tier.bg} ${tier.color}`}>
-            <span>{tier.label}</span>
-          </div>
-
-          <p className="profile-tier-moto">{tier.moto}</p>
-
-          <p className="profile-member-since">
-            <span className="profile-member-dot" />
-            Member since {memberSince}
-          </p>
         </div>
         {/* Wallet */}
         <WalletCard userId={user.id} />
         {/* Badges */}
-      <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
-          Badges Earned ({badges.length})
-        </h2>
-        <BadgeList userId={user.id} initialBadges={badges} />
-      </div>
+        <div>
+          <BadgeList userId={user.id} initialBadges={badges} />
+        </div>
 
-         {/* Streaks */}
-        <div className="profile-streak-row" style={{ transform: 'translate(100px, -40px)' }}>
+        {/* Streaks */}
+        <div className="profile-streak-row">
           <div className="profile-streak-card">
             <p className="profile-streak-value">{userRow?.current_streak ?? 0}</p>
             <p className="profile-streak-label">Current Streak</p>
@@ -183,25 +162,25 @@ export default async function ProfilePage() {
         </Link>
 
         <Link
-  href="/transactions"
-  className="flex items-center justify-between w-full px-5 py-4
+          href="/transactions"
+          className="flex items-center justify-between w-full px-5 py-4
              rounded-2xl bg-white border border-gray-100 text-gray-900
              font-semibold hover:border-green-300 hover:bg-green-50
              transition-colors shadow-sm"
->
-  <div className="flex items-center gap-3">
-    <span className="text-xl">💳</span>
-    <div className="text-left">
-      <p className="font-semibold">Transaction History</p>
-      <p className="text-xs text-gray-400 font-normal">
-        View your transactions
-      </p>
-    </div>
-  </div>
-  <span className="text-gray-300">→</span>
-</Link>
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-xl">💳</span>
+            <div className="text-left">
+              <p className="font-semibold">Transaction History</p>
+              <p className="text-xs text-gray-400 font-normal">
+                View your transactions
+              </p>
+            </div>
+          </div>
+          <span className="text-gray-300">→</span>
+        </Link>
 
-        
+
 
       </div>
     </div>
