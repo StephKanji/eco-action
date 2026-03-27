@@ -80,67 +80,42 @@ export default async function OrgOverviewPage() {
       {/* ── Pending notice ──────────────────────────────── */}
       {org.verification_status === 'pending' && (
         <div className="rounded-xl p-4 bg-yellow-50 border border-yellow-200">
-          <p className="text-sm font-medium text-yellow-800">⏳ Awaiting admin approval</p>
+          <p className="text-sm font-medium text-yellow-800"> Awaiting admin approval</p>
           <p className="text-xs text-yellow-700 mt-1">
             Your organisation is under review. You will be notified once approved.
           </p>
         </div>
       )}
 
-      {/* ── Verified content ────────────────────────────── */}
+
+
+      {/* ── Task Progress ────────────────────────────── */}
       {isVerified && (
         <>
-          {/* Stats — 2 cols on mobile, 4 on desktop */}
           <div>
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-              <div >
-                <p className="stat-card-value">{totalTasks ?? 0}</p>
-                <p className="stat-card-label">Active Tasks</p>
+            <div className="profile-card-header">
+              <p className="profile-card-title">Task Progress</p>
+            </div>
+            <div className="profile-status-grid">
+              <div className="profile-status-chip approved">
+                <p className="profile-status-lbl">total</p>
+                <p className="profile-status-num">{totalTasks ?? 0}</p>
               </div>
-              <div>
-                <p className="stat-card-value">{pendingReviews ?? 0}</p>
-                <p className="stat-card-label">Task Reviews</p>
+              <div className="profile-status-chip pending">
+
+                <p className="profile-status-lbl">Pending</p>
+                <p className="profile-status-num">{pendingReviews ?? 0}</p>
               </div>
-              <div >
-                <p className="stat-card-value">{activeChallenges ?? 0}</p>
-                <p className="stat-card-label">Active Challenges</p>
+              <div className="profile-status-chip rejected">
+                <p className="profile-status-lbl">Active</p>
+                <p className="profile-status-num">{activeChallenges ?? 0}</p>
               </div>
-              <div>
-                <p className="stat-card-value">{pendingChallengeReviews ?? 0}</p>
+              <div className="profile-status-chip challenge">
                 <p className="stat-card-label">Challenge Reviews</p>
+                <p className="stat-card-value">{pendingChallengeReviews ?? 0}</p>
               </div>
             </div>
           </div>
-
-
-
-          {/* ── Task Progress ────────────────────────────── */}
-          {isVerified && (
-            <div>
-              <div className="profile-card-header">
-                <p className="profile-card-title">Task Progress</p>
-              </div>
-              <div className="profile-status-grid">
-                <div className="profile-status-chip approved">
-                  <p className="profile-status-lbl">total</p>
-                  <p className="profile-status-num">{totalTasks ?? 0}</p>
-                </div>
-                <div className="profile-status-chip pending">
-
-                  <p className="profile-status-lbl">Pending</p>
-                  <p className="profile-status-num">{pendingReviews ?? 0}</p>
-                </div>
-                <div className="profile-status-chip rejected">
-                  <p className="profile-status-lbl">Active</p>
-                  <p className="profile-status-num">{activeChallenges ?? 0}</p>
-                </div>
-                <div className="profile-status-chip challenge">
-                  <p className="stat-card-label">Challenge Reviews</p>
-                  <p className="stat-card-value">{pendingChallengeReviews ?? 0}</p>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Points row */}
           <div>
@@ -215,7 +190,6 @@ export default async function OrgOverviewPage() {
               </Link>
             </div>
           </div>
-
         </>
       )}
 

@@ -90,21 +90,10 @@ export default async function ChallengeFeedPage() {
               <Link
                 key={challenge.id}
                 href={`/challenges/${challenge.id}`}
-                className="block rounded-2xl border border-gray-100 bg-white overflow-hidden
-                           shadow-sm hover:shadow-md hover:border-green-200 transition-all duration-200"
+                className="m-5 space-y-4"
               >
-                {/* Cover image */}
-                {challenge.cover_image_url && (
-                  <div className="h-36 overflow-hidden">
-                    <img
-                      src={challenge.cover_image_url}
-                      alt={challenge.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
 
-                <div className="p-5">
+                <div className="p-5 btn-ghost space-y-4">
                   {/* Top row */}
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="min-w-0">

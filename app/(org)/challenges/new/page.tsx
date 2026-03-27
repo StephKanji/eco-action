@@ -5,36 +5,36 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 const CATEGORIES = [
-  { value: 'tree_planting',      label: ' Tree Planting',      unit: 'trees' },
-  { value: 'waste_collection',   label: ' Waste Collection',   unit: 'kg_waste' },
-  { value: 'recycling',          label: ' Recycling',          unit: 'kg_plastic' },
-  { value: 'clean_energy',       label: ' Clean Energy',       unit: 'kwh_saved' },
+  { value: 'tree_planting', label: ' Tree Planting', unit: 'trees' },
+  { value: 'waste_collection', label: ' Waste Collection', unit: 'kg_waste' },
+  { value: 'recycling', label: ' Recycling', unit: 'kg_plastic' },
+  { value: 'clean_energy', label: ' Clean Energy', unit: 'kwh_saved' },
   { value: 'water_conservation', label: ' Water Conservation', unit: 'litres_saved' },
-  { value: 'other',              label: ' Other',              unit: 'tasks_completed' },
+  { value: 'other', label: ' Other', unit: 'tasks_completed' },
 ]
 
 // Human-readable unit labels shown in the UI
 const UNIT_LABELS: Record<string, string> = {
-  trees:           'Trees planted',
-  kg_waste:        'KG of waste collected',
-  kg_plastic:      'KG of plastic recycled',
-  kwh_saved:       'KWH of energy saved',
-  litres_saved:    'Litres of water saved',
+  trees: 'Trees planted',
+  kg_waste: 'KG of waste collected',
+  kg_plastic: 'KG of plastic recycled',
+  kwh_saved: 'KWH of energy saved',
+  litres_saved: 'Litres of water saved',
   tasks_completed: 'Tasks completed',
 }
 
 const STEPS = ['Basic Info', 'Target & Duration', 'Reward Pool', 'Preview']
 
 interface FormData {
-  title:           string
-  description:     string
-  category:        string
-  target_value:    number
-  target_unit:     string
-  reward_pool:     number
-  start_date:      string
-  end_date:        string
-  cover_image:     File | null
+  title: string
+  description: string
+  category: string
+  target_value: number
+  target_unit: string
+  reward_pool: number
+  start_date: string
+  end_date: string
+  cover_image: File | null
   cover_image_url: string
   max_participants: number | null
 }
@@ -42,21 +42,21 @@ interface FormData {
 export default function NewChallengePage() {
   const router = useRouter()
 
-  const [step, setStep]       = useState(0)
+  const [step, setStep] = useState(0)
   const [pending, setPending] = useState(false)
-  const [error, setError]     = useState('')
+  const [error, setError] = useState('')
   const [uploading, setUploading] = useState(false)
 
   const [form, setForm] = useState<FormData>({
-    title:           '',
-    description:     '',
-    category:        '',
-    target_value:    10,
-    target_unit:     'trees',
-    reward_pool:     500,
-    start_date:      '',
-    end_date:        '',
-    cover_image:     null,
+    title: '',
+    description: '',
+    category: '',
+    target_value: 10,
+    target_unit: 'trees',
+    reward_pool: 500,
+    start_date: '',
+    end_date: '',
+    cover_image: null,
     cover_image_url: '',
     max_participants: null,
   })
@@ -72,20 +72,20 @@ export default function NewChallengePage() {
     if (cat) update('target_unit', cat.unit)
   }
 
-  
+
 
   function validateStep(): string | null {
     if (step === 0) {
-      if (!form.title.trim())       return 'Title is required'
-      if (form.title.length < 5)    return 'Title must be at least 5 characters'
+      if (!form.title.trim()) return 'Title is required'
+      if (form.title.length < 5) return 'Title must be at least 5 characters'
       if (!form.description.trim()) return 'Description is required'
       if (form.description.length < 20) return 'Description must be at least 20 characters'
-      if (!form.category)           return 'Category is required'
+      if (!form.category) return 'Category is required'
     }
     if (step === 1) {
       if (!form.target_value || form.target_value <= 0) return 'Target value must be greater than 0'
       if (!form.start_date) return 'Start date is required'
-      if (!form.end_date)   return 'End date is required'
+      if (!form.end_date) return 'End date is required'
       if (new Date(form.end_date) <= new Date(form.start_date))
         return 'End date must be after start date'
       if (new Date(form.end_date) <= new Date())
@@ -110,17 +110,17 @@ export default function NewChallengePage() {
 
     try {
       const res = await fetch('/api/challenges/create', {
-        method:  'POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title:           form.title,
-          description:     form.description,
-          category:        form.category,
-          target_value:    form.target_value,
-          target_unit:     form.target_unit,
-          reward_pool:     form.reward_pool,
-          start_date:      new Date(form.start_date).toISOString(),
-          end_date:        new Date(form.end_date).toISOString(),
+          title: form.title,
+          description: form.description,
+          category: form.category,
+          target_value: form.target_value,
+          target_unit: form.target_unit,
+          reward_pool: form.reward_pool,
+          start_date: new Date(form.start_date).toISOString(),
+          end_date: new Date(form.end_date).toISOString(),
           cover_image_url: form.cover_image_url || undefined,
           max_participants: form.max_participants ?? undefined,
         }),
@@ -164,8 +164,8 @@ export default function NewChallengePage() {
               ${i < step
                 ? 'bg-green-600 text-white'
                 : i === step
-                ? 'bg-green-600 text-white ring-2 ring-green-200'
-                : 'bg-gray-100 text-gray-400'}`}>
+                  ? 'bg-green-600 text-white ring-2 ring-green-200'
+                  : 'bg-gray-100 text-gray-400'}`}>
               {i < step ? '✓' : i + 1}
             </div>
             <span className={`text-xs hidden sm:block transition-colors
@@ -227,9 +227,32 @@ export default function NewChallengePage() {
                 </button>
               ))}
             </div>
+
+            
+
+
           </div>
 
-          
+<div>
+              <label className="label">
+                Max Participants{' '}
+                <span className="text-gray-400 font-normal">(optional)</span>
+              </label>
+              <p className="text-xs text-gray-400 mb-2">
+                Leave blank to allow unlimited participants
+              </p>
+              <input
+                type="number"
+                min={2}
+                className="input"
+                placeholder="e.g. 50"
+                value={form.max_participants ?? ''}
+                onChange={e => update(
+                  'max_participants',
+                  e.target.value ? parseInt(e.target.value) : null
+                )}
+              />
+            </div>
         </div>
       )}
 
@@ -310,26 +333,7 @@ export default function NewChallengePage() {
         </div>
       )}
 
-      <div>
-            <label className="label">
-              Max Participants{' '}
-              <span className="text-gray-400 font-normal">(optional)</span>
-            </label>
-            <p className="text-xs text-gray-400 mb-2">
-              Leave blank to allow unlimited participants
-            </p>
-            <input
-              type="number"
-              min={2}
-              className="input"
-              placeholder="e.g. 50"
-              value={form.max_participants ?? ''}
-              onChange={e => update(
-                'max_participants',
-                e.target.value ? parseInt(e.target.value) : null
-              )}
-            />
-          </div>
+
 
 
       {/* ── Step 2 — Reward Pool ─────────────────────────── */}
@@ -392,16 +396,6 @@ export default function NewChallengePage() {
         <div className="space-y-4">
           <div className="card space-y-4">
 
-            {/* Cover image preview */}
-            {form.cover_image_url && (
-              <div className="rounded-xl overflow-hidden h-40 -mx-1">
-                <img
-                  src={form.cover_image_url}
-                  alt="Cover"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
 
             <div className="flex items-start justify-between gap-3">
               <h2 className="font-bold text-gray-900 text-lg leading-snug">{form.title}</h2>
@@ -413,13 +407,13 @@ export default function NewChallengePage() {
             <p className="text-sm text-gray-600 leading-relaxed">{form.description}</p>
 
             <div className="grid grid-cols-2 gap-3 pt-1">
-              <div className="stat-card">
+              <div>
                 <p className="stat-card-value text-2xl">
                   {form.target_value.toLocaleString()}
                 </p>
                 <p className="stat-card-label">{UNIT_LABELS[form.target_unit] ?? form.target_unit}</p>
               </div>
-              <div className="stat-card">
+              <div >
                 <p className="stat-card-value text-2xl text-green-600">
                   {form.reward_pool.toLocaleString()}
                 </p>
@@ -430,13 +424,13 @@ export default function NewChallengePage() {
                 <p className="text-sm font-medium text-gray-800">
                   {form.start_date
                     ? new Date(form.start_date).toLocaleDateString('en-KE', {
-                        day: 'numeric', month: 'short', year: 'numeric',
-                      })
+                      day: 'numeric', month: 'short', year: 'numeric',
+                    })
                     : '—'}
                 </p>
               </div>
               {form.max_participants && (
-                <div className="stat-card">
+                <div >
                   <p className="stat-card-value text-2xl">
                     {form.max_participants.toLocaleString()}
                   </p>
@@ -448,8 +442,8 @@ export default function NewChallengePage() {
                 <p className="text-sm font-medium text-gray-800">
                   {form.end_date
                     ? new Date(form.end_date).toLocaleDateString('en-KE', {
-                        day: 'numeric', month: 'short', year: 'numeric',
-                      })
+                      day: 'numeric', month: 'short', year: 'numeric',
+                    })
                     : '—'}
                 </p>
               </div>
@@ -502,7 +496,7 @@ export default function NewChallengePage() {
         href="/overview"
         className="block text-center text-sm text-gray-400 hover:text-gray-600 transition-colors"
       >
-         Back to Dashboard
+        Back to Dashboard
       </Link>
 
     </div>
