@@ -102,7 +102,7 @@ export default function ChallengeDetailPage() {
       .eq('id', id)
       .single()
 
-    setChallenge(ch as Challenge)
+    setChallenge(ch as unknown as Challenge)
 
     // Leaderboard
     const { data: parts } = await supabase
@@ -115,7 +115,7 @@ export default function ChallengeDetailPage() {
       .order('contribution_value', { ascending: false })
       .limit(20)
 
-    setParticipants((parts ?? []) as Participant[])
+    setParticipants((parts ?? []) as unknown as Participant[])
 
     // Has user joined?
     const { data: myRow } = await supabase

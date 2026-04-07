@@ -83,10 +83,11 @@ export default async function OrgSubmissionsPage() {
         <div className="space-y-4 mb-12">
           {submissionsWithSignedUrls.map(sub => {
             const task = sub.tasks as any
-            const submittedAt = new Date(sub.submitted_at)
-              .toLocaleDateString('en-KE', {
-                day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
-              })
+            const submittedAt = sub.submitted_at
+              ? new Date(sub.submitted_at).toLocaleDateString('en-KE', {
+                  day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                })
+              : 'Unknown date'
 
             return (
               <div key={sub.id}

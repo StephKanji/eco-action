@@ -1,16 +1,16 @@
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
-interface CardProps extends React.ComponentProps<typeof Card> {
+interface CustomCardProps extends React.ComponentProps<typeof Card> {
   variant?: "default" | "elevated" | "outline"
 }
 
-export function Card({ 
+export function CustomCard({ 
   className, 
   children, 
   variant = "default",
   ...props 
-}: CardProps) {
+}: CustomCardProps) {
   const baseClasses = "border-2 shadow-lg transition-all duration-300 hover:shadow-xl"
   
   const variants = {

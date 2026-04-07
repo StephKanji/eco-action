@@ -75,7 +75,7 @@ export default async function TransactionHistoryPage() {
             const sign = isCredit ? '+' : '-'
             const amountColor = isCredit ? 'text-green-600' : 'text-red-500'
 
-            const date = new Date(tx.created_at).toLocaleDateString('en-KE', {
+            const date = new Date(tx.created_at?? '').toLocaleDateString('en-KE', {
               day: 'numeric',
               month: 'short',
               year: 'numeric',

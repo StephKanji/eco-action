@@ -130,9 +130,9 @@ export async function POST(req: NextRequest) {
       .insert({
         from_entity_id:   org.id,
         from_entity_type: 'org',
-        to_entity_id:     challenge.id,
-        to_entity_type:   'challenge',
-        amount:           data.reward_pool,
+        to_entity_id:     null,
+        to_entity_type:   'system',
+        amount:           data.reward_pool ,
         type:             'escrow_lock',
         reference_id:     challenge.id,
       })

@@ -1,6 +1,6 @@
 "use client";
 
-import { createClient } from "../supabase/client";
+import { createClient } from "@/supabase/client";
 import { useMemo } from "react";
 
 export function useSupabase() {

@@ -8,7 +8,7 @@ interface Badge {
   name: string
   description: string
   icon: string
-  achieved_at: string
+  achieved_at: string | null
 }
 
 interface BadgeListProps {
