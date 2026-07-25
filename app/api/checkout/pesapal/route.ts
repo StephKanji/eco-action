@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     currency: 'KES',
     amount: pkg.price_kes,
     description: `${pkg.name} — ${pkg.points.toLocaleString()} points`,
-    callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/organization/wallet?pesapal_return=true`,
+    callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/wallet?pesapal_return=true`,
     billing_address: {
       email_address: org.contact_email,
       phone_number: '254700000000', // sandbox dummy number — replace with a real org phone field later
