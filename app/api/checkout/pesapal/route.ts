@@ -67,7 +67,10 @@ export async function POST(request: Request) {
     callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/organization/wallet?pesapal_return=true`,
     billing_address: {
       email_address: org.contact_email,
-    },
+      phone_number: '254700000000', // sandbox dummy number — replace with a real org phone field later
+      country_code: 'KE',
+      first_name: org.org_name,
+        },
   })
 
   if (result.error) {
