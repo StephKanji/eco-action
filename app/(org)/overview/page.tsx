@@ -130,6 +130,16 @@ export default async function OrgOverviewPage() {
               </div>
             </div>
           </div>
+          <div>
+            <Link href="/wallet" className="card-strong" style={{ display: 'block', marginTop: '12px' }}>
+    <div className="flex items-center gap-3">
+      <div>
+        <p className="font-semibold text-white">Purchase Points</p>
+        <p className="text-xs text-white/70 mt-0.5">Top up your balance to fund new tasks</p>
+      </div>
+    </div>
+  </Link>
+          </div>
 
           {/* ── Individual task actions ──────────────────── */}
           <div>
