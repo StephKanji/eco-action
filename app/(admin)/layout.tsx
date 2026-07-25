@@ -1,6 +1,7 @@
 // app/(admin)/layout.tsx
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { Navbar } from '@/components/navbar'
 
 export default async function AdminLayout({
   children,
@@ -25,5 +26,14 @@ export default async function AdminLayout({
     redirect('/login')
   }
 
-  return <>{children}</>
+  return (
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <Navbar />
+        {/* FIX: added <main> wrapper with page-content — previously children
+            rendered with no wrapper at all, sitting flush under the fixed navbar */}
+        <main className="page-content">
+          {children}
+        </main>
+      </div>
+    )
 }

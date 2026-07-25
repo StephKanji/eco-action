@@ -75,21 +75,15 @@ export default function UserRegisterPage() {
   }
 
   return (
-    <div >
-      <div >
+    <div className="hero-section pt-5" >
+      
         <div>
-          <h1 className="hero-title" style={{ fontSize: 'clamp(1.6rem, 3vw, 3.0rem)', marginBottom: '6px' }}>Create your account</h1>
-        </div>
-        <h1 className="hero-title" style={{ fontSize: 'clamp(1.2rem, 3vw, 2.1rem)', marginBottom: '6px' }}>
-          build your streak <em> and make an impact</em>
-        </h1>
+          <h1 className="hero-title" style={{ fontSize: 'clamp(1.6rem, 3vw, 3.0rem)', marginBottom: '6px' }}>
+            Create your<em> account</em></h1>
         <p className="hero-subtitle">
-          Already have an account?{' '}
-          <Link href="/login" style={{ color: 'var(--hero-green-mid)', fontWeight: 600 }}>
-            Sign in
-          </Link>
+        make an impact; build your streak
         </p>
-      </div>
+        </div>
 
       {errors.general && (
         <div className="p-3 rounded-lg bg-red-50 border border-red-200">
@@ -97,7 +91,7 @@ export default function UserRegisterPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 pt-4">
         <div>
           <label className="input-label">
             Display Name
@@ -155,12 +149,12 @@ export default function UserRegisterPage() {
         </button>
       </form>
 
-      <p className="text-xs text-center text-gray-400">
-        Are you an organization?{' '}
-        <Link href="/register/organization" className="text-green-600 hover:underline">
-          Register here
-        </Link>
-      </p>
+      <p className="hero-subtitle">
+          Already have an account?{' '}
+          <Link href="/login" style={{ color: 'var(--hero-green-mid)', fontWeight: 600 }}>
+            Sign in
+          </Link>
+        </p>
 
     </div>
   )
