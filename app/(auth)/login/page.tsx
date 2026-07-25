@@ -1,12 +1,16 @@
 'use client'
 
+import { useState } from 'react'
 import { useActionState } from 'react'
 import { login, LoginState } from './action'
 import Image from 'next/image'
+import { Eye, EyeOff } from 'lucide-react'
+
 const initialState: LoginState = {}
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(login, initialState)
+  const [showPassword, setShowPassword] = useState(false)
 
   return (
     <div>
@@ -70,12 +74,35 @@ export default function LoginPage() {
               <label className="input-label">
                 Password
               </label>
-              <input
-                name="password"
-                type="password"
-                className="input"
-                placeholder="security key"
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  className="input"
+                  placeholder="security key"
+                  style={{ paddingRight: '40px' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    color: '#6b7280',
+                  }}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               {state.errors?.password && (
                 <p className="text-xs text-red-500 mt-1">{state.errors.password[0]}</p>
               )}
