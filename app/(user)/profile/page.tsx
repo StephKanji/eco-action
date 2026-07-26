@@ -129,12 +129,18 @@ export default async function ProfilePage() {
 
       {/* ── CTAs  */}
      
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 pt-2">
         <Link
           href="/usertasks"
           className="btn btn-primary justify-center py-3 rounded-xl text-sm"
         >
            Explore More Tasks
+        </Link>
+        <Link
+          href="/redeem"
+          className="btn btn-primary justify-center py-3 rounded-xl text-sm"
+        >
+          Redeem Points
         </Link>
         <Link
           href="/transactions"
