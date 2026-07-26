@@ -6,23 +6,19 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const token_hash = searchParams.get('token_hash')
-  const type = searchParams.get('type') as 'signup' | 'org' | null
-  const next = searchParams.get('next') ?? '/'
+  const type = searchParams.get('type') as 'signup' | 'org' | 'user' | null
 
-  // Build base client
   const supabase = await createClient()
 
-  // PKCE flow — code exchange
   if (code) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (error || !data.user) {
       console.error('code exchange failed:', error?.message)
       return NextResponse.redirect(new URL('/login?error=invalid_code', origin))
     }
-    return await handleUser(data.user, searchParams.get('type'), origin, supabase)
+    return await handleUser(data.user, type, origin)
   }
 
-  // Token hash flow — email confirmation
   if (token_hash) {
     const { data, error } = await supabase.auth.verifyOtp({
       token_hash,
@@ -32,24 +28,19 @@ export async function GET(request: NextRequest) {
       console.error('token_hash exchange failed:', error?.message)
       return NextResponse.redirect(new URL('/login?error=invalid_token', origin))
     }
-    return await handleUser(data.user, searchParams.get('type'), origin, supabase)
+    return await handleUser(data.user, type, origin)
   }
 
   return NextResponse.redirect(new URL('/login?error=missing_code', origin))
 }
 
-async function handleUser(
-  user: any,
-  type: string | null,
-  origin: string,
-  supabase: any
-) {
+async function handleUser(user: any, type: string | null, origin: string) {
   const meta = user.user_metadata
   const adminClient = createAdminClient()
 
   console.log('✅ [callback] user confirmed:', user.id, 'type:', type)
 
-  // Idempotency check
+  // Idempotency check — returning user, not a first-time signup
   const { data: existing } = await adminClient
     .from('profiles')
     .select('id, role')
@@ -60,7 +51,7 @@ async function handleUser(
     const destinations: Record<string, string> = {
       user: '/profile',
       org: '/register/organization/pending',
-      admin: '/dashboard',
+      admin: '/dashboards', // FIX: was '/dashboard' (singular, no matching route)
     }
     return NextResponse.redirect(
       new URL(destinations[existing.role] ?? '/login', origin)
@@ -68,6 +59,25 @@ async function handleUser(
   }
 
   if (type === 'org') {
+    // Google sign-in never provides a KRA PIN — only your custom
+    // registration form does, via signUp's options.data. If it's
+    // missing, this is a first-time Google org sign-up, not our
+    // normal email-based org registration.
+    if (!meta?.kra_pin) {
+      console.log('✅ [callback] Google org sign-up — needs to complete details')
+
+      const { error: profileError } = await adminClient
+        .from('profiles')
+        .insert({ id: user.id, role: 'org', display_name: meta?.full_name ?? meta?.name ?? 'New Organisation' })
+
+      if (profileError) {
+        console.error('❌ profile insert failed:', profileError.message)
+        return NextResponse.redirect(new URL('/register/organization?error=profile_failed', origin))
+      }
+
+      return NextResponse.redirect(new URL('/register/organization/complete', origin))
+    }
+
     console.log('✅ [callback] creating org profile...')
 
     const { error: profileError } = await adminClient
@@ -121,13 +131,12 @@ async function handleUser(
     }
 
     return NextResponse.redirect(new URL('/register/organization/pending', origin))
-
   } else {
     console.log('✅ [callback] creating user profile...')
 
     const { error: profileError } = await adminClient
       .from('profiles')
-      .insert({ id: user.id, role: 'user', display_name: meta.display_name })
+      .insert({ id: user.id, role: 'user', display_name: meta?.display_name ?? meta?.full_name ?? meta?.name ?? 'New User' })
 
     if (profileError) {
       console.error('❌ profile insert failed:', profileError.message)

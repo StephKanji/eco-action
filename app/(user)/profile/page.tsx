@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { WalletCard } from '@/components/wallet/wallet-card'
 import { BadgeList } from '@/components/badges/badges-list'
+import UserOnboardingTour from './user-onboarding-tour'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -59,7 +60,7 @@ export default async function ProfilePage() {
   return (
     <div >
     <div className="space-y-6 pt-10">
-
+    <UserOnboardingTour />
       {/* Wallet */}
       <div >
         <div className="profile-card-header">

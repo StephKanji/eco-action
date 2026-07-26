@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
+import OrgOnboardingTour from './org-onboarding-tour'
 import Link from 'next/link'
 
 export default async function OrgOverviewPage() {
@@ -54,6 +55,7 @@ export default async function OrgOverviewPage() {
 
   return (
     <div className="space-y-6 hero-root pt-10">
+      <OrgOnboardingTour />
 
       {/* ── Header card ─────────────────────────────────── */}
       <div >

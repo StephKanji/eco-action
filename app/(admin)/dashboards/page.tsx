@@ -32,10 +32,6 @@ export default async function OrganizationsPage() {
 
   
 
- const pending = organizations?.filter(o => o.verification_status === 'pending') ?? []
-  const verified = organizations?.filter(o => o.verification_status === 'verified') ?? []
-  const rejected = organizations?.filter(o => o.verification_status === 'rejected') ?? []
-
   const orgs = organizations ?? []
   const pendingCount = orgs.filter((o) => o.verification_status === 'pending').length
   const verifiedCount = orgs.filter((o) => o.verification_status === 'verified').length

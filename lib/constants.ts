@@ -9,5 +9,5 @@ export const ROUTES = {
   PROFILE: "/profile",
   SETTINGS: "/settings",
   ORG: "/overview",
-  ADMIN: "/admin/dashboard",
+  ADMIN: "/admin/dashboards",
 } as const;
