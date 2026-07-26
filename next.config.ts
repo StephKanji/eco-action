@@ -1,11 +1,7 @@
 import type { NextConfig } from "next";
-
 const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   experimental: {
     preloadEntriesOnStart: true,
@@ -20,5 +16,4 @@ const nextConfig: NextConfig = {
     ],
   },
 };
-
 export default nextConfig;

@@ -141,6 +141,30 @@ export default function RedeemPanel({
       >
         {loading ? 'Sending airtime…' : 'Redeem Airtime'}
       </button>
+// Add this inside RedeemPanel, after the real reward cards grid, before the phone input section
+
+<div className="mt-4">
+  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+    Coming Soon
+  </p>
+  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <div
+      className="profile-status-chip"
+      style={{ opacity: 0.5, cursor: 'not-allowed' }}
+    >
+      <p className="profile-status-lbl">Gift Cards</p>
+      <p className="text-xs text-gray-400 mt-1">Redeem points for retail gift cards</p>
+    </div>
+    <div
+      className="profile-status-chip"
+      style={{ opacity: 0.5, cursor: 'not-allowed' }}
+    >
+      <p className="profile-status-lbl">Donate to a Cause</p>
+      <p className="text-xs text-gray-400 mt-1">Convert points into a real donation</p>
+    </div>
+  </div>
+</div>
+      
     </div>
   )
 }
