@@ -21,13 +21,12 @@ export default function RegisterPage() {
         {/* Choice cards */}
         <div >
           <div className="flex gap-4">
-            <button className="btn-primary" onClick={() => router.push('/register/user')}>
+            <button className="btn-ghost" onClick={() => router.push('/register/user')}>
               <div className="hero-subtitle" style={{ marginBottom: '8px' }}>Individual</div>
-              <p >
-                Complete simple tasks that build habits to care
+              <p style={{ marginBottom: '16px' }}>
+                sustain the environment, Complete simple tasks, earn points, and redeem rewards.
               </p>
-              <p > and sustain the environment, earn points, and redeem rewards.
-              </p>
+    
               <p>Get started</p>
             </button>
             <button className="btn-ghost" onClick={() => router.push('/register/organization')}>

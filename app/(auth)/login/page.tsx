@@ -37,16 +37,16 @@ export default function LoginPage() {
         <div style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(253, 246, 227, 0.2)',
+          background: 'rgba(253, 246, 227, 0.8)',
           zIndex: 1,
         }} />
 
         <div className='hero-section'>
 
           <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', marginBottom: '8px' }}>
-            Login To Your Account<br />
-            <em>let's heal the planet.</em>
+            Login To Your Account; <em>let's heal the planet.</em>
           </h1>
+          <p> log in as user, organization or admin</p>
 
           <form action={formAction} className="space-y-4">
             {state.errors?.general && (

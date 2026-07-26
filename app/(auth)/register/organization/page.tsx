@@ -88,7 +88,7 @@ export default function RegisterOrganizationPage() {
   }
 
   return (
-    <div className='hero-section pt-10' >
+    <div className='hero-section pt-30' >
 
       <div>
         <h1 className="hero-title" style={{ fontSize: 'clamp(1.2rem, 3vw, 2.1rem)', marginBottom: '6px' }}>
@@ -194,7 +194,7 @@ export default function RegisterOrganizationPage() {
         </button>
       </form>
 
-      <div className="mt-6 text-center text-sm text-gray-500">
+      <div className="mt-6 text-center text-sm text-gray-500 pb-10">
         <p>
           Already have an account?{' '}
           <Link href="/login" className="text-green-600 font-medium hover:underline">

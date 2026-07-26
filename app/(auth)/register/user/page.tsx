@@ -75,7 +75,7 @@ export default function UserRegisterPage() {
   }
 
   return (
-    <div className="hero-section pt-5" >
+    <div className="hero-section pt-20" >
       
         <div>
           <h1 className="hero-title" style={{ fontSize: 'clamp(1.6rem, 3vw, 3.0rem)', marginBottom: '6px' }}>
