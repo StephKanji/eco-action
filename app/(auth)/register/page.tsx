@@ -24,7 +24,7 @@ export default function RegisterPage() {
             <button className="btn-ghost" onClick={() => router.push('/register/user')}>
               <div className="hero-subtitle" style={{ marginBottom: '8px' }}>Individual</div>
               <p style={{ marginBottom: '16px' }}>
-                sustain the environment, Complete simple tasks, earn points, and redeem rewards.
+                Complete eco-tasks, earn and redeem points.
               </p>
     
               <p>Get started</p>

@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react'
 
 const STEPS = [
   {
-    title: 'Complete a task',
-    description: 'Pick an eco-task nearby eg: plant a tree and submit proof when you are done.',
+    title: 'Complete a eco-task',
+    description: 'Plant a tree and submit proof when you are done.',
   },
   {
     title: 'Earn points',
