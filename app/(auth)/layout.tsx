@@ -1,4 +1,5 @@
 import {Navbar} from "@/components/navbar"
+import {NavHistoryBar} from "@/components/nav-history-bar"
 
 export default function AuthLayout({
   children,
@@ -8,6 +9,7 @@ export default function AuthLayout({
   return (
     <div className="min-h-screen bg-gray-50 justify-center">
       <Navbar />
+      <NavHistoryBar/>
       {children}
     </div>
   )

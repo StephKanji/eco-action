@@ -1,11 +1,11 @@
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import OrgApprovalCard from './OrgApprovalCard'
 import Link from 'next/link'
+import AdminOnboardingTour from './admin-onboarding-tour'
+import OrgFilterView from './org-filter-view'
 
 export default async function OrganizationsPage() {
   const adminClient = createAdminClient()
-  // Fetch all orgs with their profile info
+
   const { data: organizations, error } = await adminClient
     .from('organizations')
     .select(`
@@ -19,25 +19,37 @@ export default async function OrganizationsPage() {
       profile_id
     `)
     .order('created_at', { ascending: false })
+
   if (error) {
     return (
-      <div className="p-4 bg-red-50 rounded-lg text-red-600 text-sm">
-        Failed to load organisations: {error.message}
+      <div className="hero-root pt-10">
+        <div className="p-4 bg-red-50 rounded-lg text-red-600 text-sm">
+          Failed to load organisations: {error.message}
+        </div>
       </div>
     )
   }
-  const pending = organizations?.filter(o => o.verification_status === 'pending') ?? []
+
+  
+
+ const pending = organizations?.filter(o => o.verification_status === 'pending') ?? []
   const verified = organizations?.filter(o => o.verification_status === 'verified') ?? []
   const rejected = organizations?.filter(o => o.verification_status === 'rejected') ?? []
+
+  const orgs = organizations ?? []
+  const pendingCount = orgs.filter((o) => o.verification_status === 'pending').length
+  const verifiedCount = orgs.filter((o) => o.verification_status === 'verified').length
+  const rejectedCount = orgs.filter((o) => o.verification_status === 'rejected').length
+
   return (
-    <div className="hero-root p-10">
-      {/* Page header */}
-      <div className="flex items-start justify-between gap-4">
+    <div className="space-y-6 hero-root pt-10">
+      <AdminOnboardingTour />
+
+      {/* ── Header ─────────────────────────────────────── */}
+      <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', marginBottom: '8px' }}>Admin Dashboard</h1>
-          <p className="hero-subtitle">
-            Review and approve organisation registrations
-          </p>
+          <h1 className="page-title">Admin Dashboard</h1>
+          <p className="page-subtitle">Review and approve organisation registrations</p>
         </div>
         <Link
           href="/transaction-page"
@@ -46,67 +58,14 @@ export default async function OrganizationsPage() {
           View Transactions
         </Link>
       </div>
-      {/* Stats row */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-          <p className="text-sm text-yellow-700 font-medium">Pending review</p>
-          <p className="text-3xl font-bold text-yellow-800 mt-1">{pending.length}</p>
-        </div>
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-          <p className="text-sm text-green-700 font-medium">Verified</p>
-          <p className="text-3xl font-bold text-green-800 mt-1">{verified.length}</p>
-        </div>
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-          <p className="text-sm text-red-700 font-medium">Rejected</p>
-          <p className="text-3xl font-bold text-red-800 mt-1">{rejected.length}</p>
-        </div>
-      </div>
-      {/* Pending section */}
-      <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-4">
-          <span className="w-2 h-2 rounded-full bg-yellow-400 inline-block" />
-          Pending Review
-        </h2>
-        {pending.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
-            <p className="text-gray-400 text-sm">No pending organisations 🎉</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {pending.map(org => (
-              <OrgApprovalCard key={org.id} org={org} />
-            ))}
-          </div>
-        )}
-      </section>
-      {/* Verified section */}
-      {verified.length > 0 && (
-        <section>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
-            Verified
-          </h2>
-          <div className="space-y-4">
-            {verified.map(org => (
-              <OrgApprovalCard key={org.id} org={org} />
-            ))}
-          </div>
-        </section>
-      )}
-      {/* Rejected section */}
-      {rejected.length > 0 && (
-        <section>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-red-400 inline-block" />
-            Rejected
-          </h2>
-          <div className="space-y-4">
-            {rejected.map(org => (
-              <OrgApprovalCard key={org.id} org={org} />
-            ))}
-          </div>
-        </section>
-      )}
+
+      {/* ── Filterable list (dropdown + stat cards + cards) ── */}
+      <OrgFilterView
+        organizations={orgs}
+        pendingCount={pendingCount}
+        verifiedCount={verifiedCount}
+        rejectedCount={rejectedCount}
+      />
     </div>
   )
 }

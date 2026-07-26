@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import { Navbar } from '@/components/navbar'
+import { NavHistoryBar } from '@/components/nav-history-bar'
 
 export default async function OrgLayout({
   children,
@@ -42,6 +43,7 @@ export default async function OrgLayout({
       <Navbar />
       {/* FIX: added <main> wrapper with page-content — previously children
           rendered with no wrapper at all, sitting flush under the fixed navbar */}
+      <NavHistoryBar />
       <main className="page-content">
         {children}
       </main>

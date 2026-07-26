@@ -1059,3 +1059,165 @@
   }
 
 }
+
+/* ════════════════════════════════════════════════════════
+   ─── Admin Onboarding Tour (new — appended only)
+   ════════════════════════════════════════════════════════ */
+@layer components {
+  .tour-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.55);
+    backdrop-filter: blur(2px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: tour-fade-in 0.2s ease-out;
+  }
+
+  @keyframes tour-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .tour-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 24px 20px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    animation: tour-rise 0.25s ease-out;
+  }
+
+  @keyframes tour-rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .tour-step-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .tour-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+
+  .tour-description {
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .tour-dots {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+
+  .tour-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    transition: background 0.2s ease, width 0.2s ease;
+  }
+
+  .tour-dot.active {
+    background: #16a34a;
+    width: 18px;
+  }
+
+  .tour-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .tour-skip-btn {
+    font-size: 13px;
+    color: #9ca3af;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 4px;
+  }
+
+  .tour-skip-btn:hover {
+    color: #6b7280;
+  }
+
+  .tour-next-btn {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background: #16a34a;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .tour-next-btn:hover {
+    background: #15803d;
+  }
+
+  /* ── Admin dropdown filter ── */
+  .admin-filter-select {
+    appearance: none;
+    -webkit-appearance: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text);
+    background-color: white;
+    border: 1px solid var(--cream-border);
+    border-radius: var(--radius-lg);
+    padding: 8px 36px 8px 14px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .admin-filter-select:hover {
+    border-color: var(--hero-green-bright);
+  }
+
+  .admin-filter-select:focus {
+    outline: none;
+    border-color: var(--hero-green-bright);
+    box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.15);
+  }
+
+  .admin-stat-card {
+    border-radius: var(--radius-xl);
+    padding: 18px 16px;
+    border: 1px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  .admin-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .admin-stat-card.active {
+    border-color: currentColor;
+  }
+}

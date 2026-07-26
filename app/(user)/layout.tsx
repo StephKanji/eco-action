@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Navbar } from '@/components/navbar'
+import { NavHistoryBar } from '@/components/nav-history-bar'
 
 export default async function UserLayout({
     children,
@@ -15,6 +16,7 @@ export default async function UserLayout({
     return (
         <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
             <Navbar />
+            <NavHistoryBar />
             <main className="page-content pt-[100px]">
                 {children}
             </main>

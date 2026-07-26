@@ -49,7 +49,7 @@ export default function OrgApprovalCard({ org }: { org: Org }) {
   }[org.verification_status] ?? 'bg-gray-100 text-gray-600'
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
+    <div className="bg-white border border-gray-200 backdrop-blur-sm  rounded-xl p-6 space-y-4">
 
       {/* Header row */}
       <div className="flex items-start justify-between gap-4">
