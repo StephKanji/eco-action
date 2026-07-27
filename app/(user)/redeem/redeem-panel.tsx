@@ -141,7 +141,6 @@ export default function RedeemPanel({
       >
         {loading ? 'Sending airtime…' : 'Redeem Airtime'}
       </button>
-// Add this inside RedeemPanel, after the real reward cards grid, before the phone input section
 
 <div className="mt-4">
   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">

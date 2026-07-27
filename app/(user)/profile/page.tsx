@@ -63,11 +63,20 @@ export default async function ProfilePage() {
     <UserOnboardingTour />
       {/* Wallet */}
       <div >
-        <div className="profile-card-header">
-          <p className="profile-card-title">Wallet: Complete tasks to rise tier</p>
-        </div>
-        {/* WalletCard handles its own loading state */}
+        <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="profile-card-title pb-5">Welcome, {profile?.display_name || user.email}</p>
+          {/* WalletCard handles its own loading state */}
         <WalletCard userId={user.id} />
+        </div>
+        
+    
+        <Link
+          href="/redeem"
+          className="btn btn-primary justify-center py-3 rounded-xl text-sm"
+        >
+          Redeem Points
+        </Link></div>
       </div>
 
       {/* Streaks */}
@@ -137,12 +146,7 @@ export default async function ProfilePage() {
         >
            Explore More Tasks
         </Link>
-        <Link
-          href="/redeem"
-          className="btn btn-primary justify-center py-3 rounded-xl text-sm"
-        >
-          Redeem Points
-        </Link>
+        
         <Link
           href="/transactions"
           className="btn btn-primary justify-center py-3 rounded-xl text-sm"
