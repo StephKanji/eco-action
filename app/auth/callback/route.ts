@@ -40,23 +40,37 @@ async function handleUser(user: any, type: string | null, origin: string) {
 
   console.log('✅ [callback] user confirmed:', user.id, 'type:', type)
 
-  // Idempotency check — returning user, not a first-time signup
-  const { data: existing } = await adminClient
+  const { data: existing, error: existingError } = await adminClient
     .from('profiles')
     .select('id, role')
     .eq('id', user.id)
     .single()
 
-  if (existing) {
-    const destinations: Record<string, string> = {
-      user: '/profile',
-      org: '/register/organization/pending',
-      admin: '/dashboards', // FIX: was '/dashboard' (singular, no matching route)
-    }
-    return NextResponse.redirect(
-      new URL(destinations[existing.role] ?? '/login', origin)
-    )
+  if (existingError && existingError.code !== 'PGRST116') {
+    console.error('❌ profile lookup failed:', existingError.message)
+    return NextResponse.redirect(new URL('/login?error=profile_lookup_failed', origin))
   }
+
+ if (type === 'login') {
+  if (!existing) {
+    console.log(' [callback] Google login attempt, no account found')
+    return NextResponse.redirect(new URL('/login?error=no_account', origin))
+  }
+
+  const destinations: Record<string, string> = {
+    user: '/profile',
+    org: '/register/organization/pending',
+    admin: '/dashboards',
+  }
+  return NextResponse.redirect(
+    new URL(destinations[existing.role] ?? '/login', origin)
+  )
+}
+
+  if (existing) {
+  console.log(' [callback] existing account signed in via Google, role:', existing.role)
+  return NextResponse.redirect(new URL('/login?message=account_exists', origin))
+}
 
   if (type === 'org') {
     // Google sign-in never provides a KRA PIN — only your custom
@@ -75,7 +89,7 @@ async function handleUser(user: any, type: string | null, origin: string) {
         return NextResponse.redirect(new URL('/register/organization?error=profile_failed', origin))
       }
 
-      return NextResponse.redirect(new URL('/register/organization/complete', origin))
+      return NextResponse.redirect(new URL('/register/organization', origin))
     }
 
     console.log('✅ [callback] creating org profile...')
@@ -132,6 +146,21 @@ async function handleUser(user: any, type: string | null, origin: string) {
 
     return NextResponse.redirect(new URL('/register/organization/pending', origin))
   } else {
+                if (!meta?.phone) {
+                  console.log(' Google user sign-up — needs to complete details')
+
+                  const { error: profileError } = await adminClient
+                    .from('profiles')
+                    .insert({ id: user.id, role: 'user', display_name: meta?.full_name ?? meta?.name ?? 'New User' })
+
+                  if (profileError) {
+                    console.error('❌ profile insert failed:', profileError.message)
+                    return NextResponse.redirect(new URL('/register/user?error=profile_failed', origin))
+                  }
+
+                  return NextResponse.redirect(new URL('/register/user', origin))
+                }
+
     console.log('✅ [callback] creating user profile...')
 
     const { error: profileError } = await adminClient

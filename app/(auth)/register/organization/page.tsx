@@ -21,6 +21,7 @@ export default function RegisterOrganizationPage() {
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback?type=${intendedType}`,
+        scopes: 'profile email',
       },
     })
   }

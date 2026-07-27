@@ -21,9 +21,12 @@ export default function UserRegisterPage() {
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback?type=${intendedType}`,
+        scopes: 'profile email',
       },
     })
   }
+
+
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

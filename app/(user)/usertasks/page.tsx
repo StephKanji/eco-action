@@ -4,19 +4,25 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
 const CATEGORY_LABELS: Record<string, string> = {
-  tree_planting:      '🌱 Tree Planting',
-  waste_collection:   '🗑️ Waste Collection',
-  recycling:          '♻️ Recycling',
-  clean_energy:       '⚡ Clean Energy',
-  water_conservation: '💧 Water Conservation',
-  other:              '🌍 Other',
+  tree_planting:      ' Tree Planting',
+  waste_collection:   ' Waste Collection',
+  recycling:          ' Recycling',
+  clean_energy:       ' Clean Energy',
+  water_conservation: ' Water Conservation',
+  other:              ' Other',
 }
 
 const PROOF_LABELS: Record<string, string> = {
-  photo:       '📷 Photo',
-  gps_checkin: '📍 GPS Check-in',
-  qr_scan:     '🔲 QR Scan',
-  receipt:     '🧾 Receipt',
+  photo:       ' Photo',
+  gps_checkin: ' GPS Check-in',
+  qr_scan:     ' QR Scan',
+  receipt:     ' Receipt',
+}
+
+const STATUS_LABELS: Record<string, { label: string; className: string }> = {
+  pending:  { label: '⏳ Submitted',  className: 'bg-yellow-50 text-yellow-600' },
+  approved: { label: '✓ Approved',    className: 'bg-blue-50 text-blue-600' },
+  rejected: { label: '✕ Rejected',    className: 'bg-red-50 text-red-500' },
 }
 
 export default async function TaskFeedPage() {
@@ -45,6 +51,31 @@ export default async function TaskFeedPage() {
     .gt('deadline', new Date().toISOString())
     .order('created_at', { ascending: false })
 
+  const taskIds = (tasks ?? []).map(t => t.id)
+
+  // Participant counts + the current user's own submission status per task —
+  // there's no stored count column on `tasks` (unlike community_challenges),
+  // so we aggregate from task_submissions ourselves.
+  const { data: submissions } = taskIds.length
+    ? await adminClient
+        .from('task_submissions')
+        .select('task_id, user_id, status')
+        .in('task_id', taskIds)
+    : { data: [] as { task_id: string; user_id: string; status: string }[] }
+
+  const participantCounts: Record<string, number> = {}
+  const myStatusByTask: Record<string, string> = {}
+
+  for (const sub of submissions ?? []) {
+    // Rejected submissions don't count as active participation.
+    if (sub.status !== 'rejected') {
+      participantCounts[sub.task_id] = (participantCounts[sub.task_id] ?? 0) + 1
+    }
+    if (sub.user_id === user.id) {
+      myStatusByTask[sub.task_id] = sub.status
+    }
+  }
+
   return (
     <div className="space-y-6">
 
@@ -55,17 +86,17 @@ export default async function TaskFeedPage() {
       </div>
 
       {/* Tab bar — Tasks is active here, Challenges links out */}
-      <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
+      <div className="flex gap-1 p-1 rounded-full">
         <span
-          className="px-4 py-2 rounded-lg text-sm font-medium
+          className="px-4 py-2 rounded-full btn-ghost:hover
                      bg-white text-green-700 shadow-sm"
         >
           Tasks
         </span>
         <Link
           href="/challenges"
-          className="px-4 py-2 rounded-lg text-sm font-medium text-gray-500
-                     hover:text-gray-700 transition-colors"
+          className="px-4 py-2 rounded-full btn-ghost:hover
+                     bg-white text-green-700 shadow-sm"
         >
           Challenges
         </Link>
@@ -86,15 +117,17 @@ export default async function TaskFeedPage() {
               (deadline.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
             )
             const org = task.organizations as any
+            const joinedCount = participantCounts[task.id] ?? 0
+            const myStatus = myStatusByTask[task.id]
+            // Only count toward the cap if the CURRENT user hasn't already
+            // submitted — otherwise a user who already submitted would see
+            // their own task as blocked once the cap fills behind them.
+            const spotsFull = task.max_participants != null
+              && joinedCount >= task.max_participants
+              && !myStatus
 
-            return (
-              <Link
-                key={task.id}
-                href={`/usertasks/${task.id}`}
-                className="block rounded-2xl border border-gray-100 bg-white p-5
-                           shadow-sm hover:shadow-md hover:border-green-200
-                           transition-all duration-200"
-              >
+            const cardContent = (
+              <>
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="min-w-0">
                     <p className="text-xs text-gray-400 font-medium truncate">
@@ -126,11 +159,21 @@ export default async function TaskFeedPage() {
                       📍 {task.location_name}
                     </span>
                   )}
-                  {task.max_participants && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-orange-50 text-orange-600">
-                      👥 {task.max_participants} spots
+
+                  {/* Participant count — shows fill against the cap when one exists */}
+                  <span className={`text-xs px-2 py-1 rounded-full font-medium
+                    ${spotsFull ? 'bg-red-50 text-red-500' : 'bg-orange-50 text-orange-600'}`}>
+                    👥 {joinedCount}{task.max_participants ? ` / ${task.max_participants}` : ''}
+                    {spotsFull ? ' (full)' : ''}
+                  </span>
+
+                  {/* Current user's own submission status, if they've already submitted */}
+                  {myStatus && STATUS_LABELS[myStatus] && (
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${STATUS_LABELS[myStatus].className}`}>
+                      {STATUS_LABELS[myStatus].label}
                     </span>
                   )}
+
                   <span className={`text-xs px-2 py-1 rounded-full ml-auto font-medium
                     ${daysLeft <= 2
                       ? 'bg-red-50 text-red-600'
@@ -141,6 +184,34 @@ export default async function TaskFeedPage() {
                     ⏰ {daysLeft}d left
                   </span>
                 </div>
+              </>
+            )
+
+            // Full tasks (that this user hasn't already submitted to) render
+            // as a non-interactive card instead of a link — blocks reaching
+            // the submission form entirely rather than just styling the badge.
+            if (spotsFull) {
+              return (
+                <div
+                  key={task.id}
+                  aria-disabled="true"
+                  className="block rounded-2xl border border-gray-100 bg-white p-5
+                             opacity-60 cursor-not-allowed"
+                >
+                  {cardContent}
+                </div>
+              )
+            }
+
+            return (
+              <Link
+                key={task.id}
+                href={`/usertasks/${task.id}`}
+                className="block rounded-2xl border border-gray-100 bg-white p-5
+                           shadow-sm hover:shadow-md hover:border-green-200
+                           transition-all duration-200"
+              >
+                {cardContent}
               </Link>
             )
           })}

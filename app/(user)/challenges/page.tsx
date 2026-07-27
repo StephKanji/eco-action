@@ -4,12 +4,12 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
 const CATEGORY_LABELS: Record<string, string> = {
-  tree_planting:      '🌱 Tree Planting',
-  waste_collection:   '🗑️ Waste Collection',
-  recycling:          '♻️ Recycling',
-  clean_energy:       '⚡ Clean Energy',
-  water_conservation: '💧 Water Conservation',
-  other:              '🌍 Other',
+  tree_planting:      ' Tree Planting',
+  waste_collection:   ' Waste Collection',
+  recycling:          ' Recycling',
+  clean_energy:       ' Clean Energy',
+  water_conservation: ' Water Conservation',
+  other:              ' Other',
 }
 
 const UNIT_LABELS: Record<string, string> = {
@@ -59,6 +59,24 @@ export default async function ChallengeFeedPage() {
         <p className="page-subtitle">
           Join forces with others to hit shared eco goals and earn from a reward pool
         </p>
+      </div>
+
+      {/* Tab bar — Tasks is active here, Challenges links out */}
+      <div className="flex gap-1 p-1 btn-ghost:hover rounded-full">
+        <Link
+          href="/usertasks"
+          className="px-4 py-2 rounded-full btn-ghost:hover
+                     bg-white text-green-700 shadow-sm"
+        >
+          Tasks
+        </Link>
+        <Link
+          href="/challenges"
+          className="px-4 py-2 rounded-full btn-ghost:hover
+                     bg-white text-green-700 shadow-sm"
+        >
+          Challenges
+        </Link>
       </div>
 
       {/* Empty state */}
