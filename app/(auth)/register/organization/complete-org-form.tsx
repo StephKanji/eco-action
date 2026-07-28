@@ -1,0 +1,132 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
+import { useRouter, useSearchParams } from 'next/navigation'
+
+export default function CompleteOrgForm() {
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [pending, setPending] = useState(false)
+  const [email, setEmail] = useState('')
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const orgName = searchParams.get('org_name') ?? ''
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) {
+        router.push('/login')
+        return
+      }
+      setEmail(data.user.email ?? '')
+    })
+  }, [])
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setPending(true)
+    setErrors({})
+
+    const form = new FormData(e.currentTarget)
+    const kra_pin = form.get('kra_pin') as string
+    const description = form.get('description') as string
+
+    if (kra_pin.length !== 11) {
+      setErrors({ kra_pin: 'Enter a valid KRA PIN' })
+      setPending(false)
+      return
+    }
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
+    const res = await fetch('/api/complete-org-profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.id, kra_pin, description }),
+    })
+
+    if (!res.ok) {
+      const err = await res.json()
+      setErrors({ general: err.error ?? 'Something went wrong. Please try again.' })
+      setPending(false)
+      return
+    }
+
+    router.push('/register/organization/pending')
+  }
+
+  return (
+    <div className='hero-section pt-30'>
+
+      <div>
+        <h1 className="hero-title" style={{ fontSize: 'clamp(1.2rem, 3vw, 2.1rem)', marginBottom: '6px' }}>
+          Almost there, <em>{orgName || 'friend'}</em>
+        </h1>
+        <p className="hero-subtitle">
+          Just your KRA PIN and a short description, and we'll submit your organisation for admin review.
+        </p>
+      </div>
+
+      {errors.general && (
+        <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200">
+          <p className="text-sm text-red-600">{errors.general}</p>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className="input-label">Signed in as</label>
+          <input type="text" value={email} disabled className="input" />
+        </div>
+
+        <div>
+          <label htmlFor="kra_pin" className="input-label">
+            KRA PIN
+          </label>
+          <input
+            id="kra_pin"
+            name="kra_pin"
+            type="text"
+            placeholder="A123456789Z"
+            maxLength={11}
+            className="input"
+          />
+          {errors.kra_pin && (
+            <p className="mt-1 text-xs text-red-500">{errors.kra_pin}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="description" className="input-label">
+            Description{' '}
+            <span className="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            rows={3}
+            placeholder="Explain briefly what your organization does and your sustainability initiatives."
+            className="input"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={pending}
+          className="w-full py-2.5 px-4 btn btn-ghost"
+        >
+          {pending ? 'Submitting...' : 'Finish setting up'}
+        </button>
+      </form>
+    </div>
+  )
+}

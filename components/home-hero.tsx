@@ -41,7 +41,7 @@ export function HomeHero() {
       <div className="hero-cta-row mt-6">
         <button
           className="btn-primary"
-          onClick={() => router.push('/register')}
+          onClick={() => router.push('/register/user')}
         >
           Start Your Journey
         </button>

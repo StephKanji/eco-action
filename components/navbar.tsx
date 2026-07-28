@@ -21,7 +21,6 @@ export const Navbar = async () => {
   let tierRow = null
 
   if (user) {
-    // FIX: added created_at to the profile select so we can show member-since
     const { data } = await supabase
       .from('profiles')
       .select('role, display_name, created_at')
@@ -38,7 +37,6 @@ export const Navbar = async () => {
       org = orgData
     }
 
-    // FIX: fetch tier_id for user role — single extra query, reuses existing supabase client
     if (profile?.role === 'user') {
       const { data: userData } = await supabase
         .from('users')
@@ -51,6 +49,11 @@ export const Navbar = async () => {
 
   const isUser = profile?.role === 'user'
   const isOrg  = profile?.role === 'org'
+
+  // Only show the profile pill once a role has actually been assigned —
+  // an authenticated user mid-flow on /redirect (no profile row yet), or
+  // an admin (no dedicated frontend surface yet), gets Logout only.
+  const showProfilePill = isUser || isOrg
 
   const displayName  = isOrg
     ? org?.org_name ?? 'Organisation'
@@ -79,60 +82,60 @@ export const Navbar = async () => {
         <div className="flex items-center gap-3">
           {user ? (
             <>
-              {/* Profile pill — clicking goes to profile/overview */}
-              <Link
-                href={profileHref}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-2xl
-                           bg-green-50 border border-green-200 hover:bg-green-100
-                           transition-colors group"
-              >
-                {/* Avatar initial */}
-                <span
-                  className="w-7 h-7 rounded-full bg-green-600 text-white text-xs
-                             font-bold flex items-center justify-center shrink-0"
+              {showProfilePill && (
+                <Link
+                  href={profileHref}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-2xl
+                             bg-green-50 border border-green-200 hover:bg-green-100
+                             transition-colors group"
                 >
-                  {initial}
-                </span>
-
-                {/* Name + meta — hidden on very small screens */}
-                <div className="hidden sm:flex flex-col leading-tight">
-                  <span className="text-sm font-medium text-green-800 max-w-[120px] truncate">
-                    {displayName}
+                  {/* Avatar initial */}
+                  <span
+                    className="w-7 h-7 rounded-full bg-green-600 text-white text-xs
+                               font-bold flex items-center justify-center shrink-0"
+                  >
+                    {initial}
                   </span>
 
-                  {/* FIX: tier badge shown for users, member-since for orgs */}
-                  {isUser && tier && (
-                    <span className={`text-xs font-medium ${tier.color}`}>
-                      {tier.icon} {tier.label}
-                      {memberSince && (
-                        <span className="text-gray-400 font-normal"> · {memberSince}</span>
-                      )}
+                  {/* Name + meta — hidden on very small screens */}
+                  <div className="hidden sm:flex flex-col leading-tight">
+                    <span className="text-sm font-medium text-green-800 max-w-[120px] truncate">
+                      {displayName}
+                    </span>
+
+                    {isUser && tier && (
+                      <span className={`text-xs font-medium ${tier.color}`}>
+                        {tier.icon} {tier.label}
+                        {memberSince && (
+                          <span className="text-gray-400 font-normal"> · {memberSince}</span>
+                        )}
+                      </span>
+                    )}
+
+                    {isOrg && memberSince && (
+                      <span className="text-xs text-gray-400">
+                        Since {memberSince}
+                        {org?.verification_status === 'pending'  && <span className="ml-1 text-yellow-500">⏳</span>}
+                        {org?.verification_status === 'verified' && <span className="ml-1 text-green-500">✓</span>}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Mobile: just show verification status dot for orgs */}
+                  {isOrg && (
+                    <span className="sm:hidden text-xs">
+                      {org?.verification_status === 'pending'  && '⏳'}
+                      {org?.verification_status === 'verified' && '✓'}
                     </span>
                   )}
-
-                  {isOrg && memberSince && (
-                    <span className="text-xs text-gray-400">
-                      Since {memberSince}
-                      {org?.verification_status === 'pending'  && <span className="ml-1 text-yellow-500">⏳</span>}
-                      {org?.verification_status === 'verified' && <span className="ml-1 text-green-500">✓</span>}
-                    </span>
-                  )}
-                </div>
-
-                {/* Mobile: just show verification status dot for orgs */}
-                {isOrg && (
-                  <span className="sm:hidden text-xs">
-                    {org?.verification_status === 'pending'  && '⏳'}
-                    {org?.verification_status === 'verified' && '✓'}
-                  </span>
-                )}
-              </Link>
+                </Link>
+              )}
 
               <LogoutButton />
             </>
           ) : (
             <>
-              <Link href="/register" className="btn-ghost">Sign up</Link>
+              <Link href="/register/user" className="btn-ghost">Sign up</Link>
               <Link href="/login"    className="btn-ghost">Login</Link>
             </>
           )}
