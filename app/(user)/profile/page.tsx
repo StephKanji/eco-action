@@ -5,11 +5,14 @@ import Link from 'next/link'
 import { WalletCard } from '@/components/wallet/wallet-card'
 import { BadgeList } from '@/components/badges/badges-list'
 import UserOnboardingTour from './user-onboarding-tour'
+import { requireRole } from '@/lib/auth/guard'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+
+    const {role} = await requireRole(['user'])
 
   const adminClient = createAdminClient()
 

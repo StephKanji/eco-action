@@ -1,11 +1,12 @@
+// app/api/complete-org-profile/route.ts
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
-  const { userId, kra_pin, description } = await request.json()
+  const { userId, description } = await request.json()
 
-  if (!userId || !kra_pin) {
-    return NextResponse.json({ error: 'userId and kra_pin are required' }, { status: 400 })
+  if (!userId) {
+    return NextResponse.json({ error: 'userId is required' }, { status: 400 })
   }
 
   const adminClient = createAdminClient()
@@ -29,7 +30,6 @@ export async function POST(request: Request) {
       profile_id: userId,
       org_name: profile.display_name,
       contact_email: contactEmail,
-      kra_pin,
       description: description ?? null,
     })
 
@@ -51,7 +51,6 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         org_name: profile.display_name,
         contact_email: contactEmail,
-        kra_pin,
         description: description ?? '',
         approveUrl: `${baseUrl}/api/admin/review?token=${tokenData.token}&action=approve`,
         rejectUrl: `${baseUrl}/api/admin/review?token=${tokenData.token}&action=reject`,

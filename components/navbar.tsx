@@ -72,7 +72,7 @@ export const Navbar = async () => {
 
   return (
     <nav className="w-full fixed top-0 left-0 right-0 z-50">
-      <header className="hero-header p-15">
+      <header className="hero-header bg-transparent p-15">
 
         {/* Logo */}
         <Link href="/" className="flex items-center logo">

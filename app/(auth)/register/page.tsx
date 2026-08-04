@@ -19,9 +19,6 @@ export default function RedirectPage() {
     setPending(role)
     setError(null)
 
-    // The account already exists (created on the previous form, via
-    // password signup or Google) — we just need to know who it is so
-    // we can attach a role to it.
     const { data: { user }, error: userError } = await supabase.auth.getUser()
 
     if (userError || !user) {
@@ -54,9 +51,6 @@ export default function RedirectPage() {
       return
     }
 
-    // Individuals land straight on the home page; organisations still
-    // need to submit their remaining details (KRA PIN, description, etc.)
-    // before their registration is complete.
     router.push(role === 'org' ? '/register/organization' : '/profile')
   }
 
@@ -82,26 +76,22 @@ export default function RedirectPage() {
         <div >
           <div className="flex gap-4">
             <button
-              className="btn-ghost"
+              className="btn-ghost rounded-lg"
               onClick={() => handleRoleSelect('user')}
               disabled={pending !== null}
             >
               <div className="hero-subtitle" style={{ marginBottom: '8px' }}>Individual</div>
-              <p style={{ marginBottom: '16px' }}>
-                Complete eco-tasks, earn and redeem points.
-              </p>
+             
 
               <p>{pending === 'user' ? 'Setting up...' : 'Get started'}</p>
             </button>
             <button
-              className="btn-ghost"
+              className=" btn-ghost rounded-lg"
               onClick={() => handleRoleSelect('org')}
               disabled={pending !== null}
             >
               <div className="hero-subtitle" style={{ marginBottom: '8px' }}>Organization</div>
-              <p style={{ marginBottom: '16px' }}>
-                Post tasks, reward  and engage your community.
-              </p>
+              
               <p >{pending === 'org' ? 'Setting up...' : 'Get started'}</p>
             </button>
           </div>
@@ -112,7 +102,7 @@ export default function RedirectPage() {
         <p className="hero-proof-text" style={{ marginTop: '32px', textAlign: 'center' }}>
           Already have an account?{' '}
           <Link href="/login" style={{ color: 'var(--hero-green-mid)', fontWeight: 900 }}>
-            Sign in
+            Log in
           </Link>
         </p>
 

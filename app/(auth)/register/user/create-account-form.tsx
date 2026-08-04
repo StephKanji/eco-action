@@ -98,7 +98,7 @@ export default function CreateAccountForm() {
           Create your <em>account</em>
         </h1>
         <p className="hero-subtitle">
-          make an impact; build your streak
+          Join as a user or an organization
         </p>
       </div>
 
@@ -178,7 +178,7 @@ export default function CreateAccountForm() {
       <p className="hero-subtitle pt-5 pb-5">
         Already have an account?{' '}
         <Link href="/login" style={{ color: 'var(--hero-green-mid)', fontWeight: 600 }}>
-          Sign in
+          Log in
         </Link>
       </p>
 

@@ -12,7 +12,6 @@ export default async function OrganizationsPage() {
       id,
       org_name,
       contact_email,
-      kra_pin,
       description,
       verification_status,
       created_at,
@@ -29,8 +28,6 @@ export default async function OrganizationsPage() {
       </div>
     )
   }
-
-  
 
   const orgs = organizations ?? []
   const pendingCount = orgs.filter((o) => o.verification_status === 'pending').length

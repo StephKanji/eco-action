@@ -33,14 +33,9 @@ export default function CompleteOrgForm() {
     setErrors({})
 
     const form = new FormData(e.currentTarget)
-    const kra_pin = form.get('kra_pin') as string
     const description = form.get('description') as string
 
-    if (kra_pin.length !== 11) {
-      setErrors({ kra_pin: 'Enter a valid KRA PIN' })
-      setPending(false)
-      return
-    }
+  
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
@@ -51,7 +46,7 @@ export default function CompleteOrgForm() {
     const res = await fetch('/api/complete-org-profile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: user.id, kra_pin, description }),
+      body: JSON.stringify({ userId: user.id, description }),
     })
 
     if (!res.ok) {
@@ -72,7 +67,7 @@ export default function CompleteOrgForm() {
           Almost there, <em>{orgName || 'friend'}</em>
         </h1>
         <p className="hero-subtitle">
-          Just your KRA PIN and a short description, and we'll submit your organisation for admin review.
+          Just add your a short description, and we'll submit your organisation for admin review.
         </p>
       </div>
 
@@ -88,22 +83,6 @@ export default function CompleteOrgForm() {
           <input type="text" value={email} disabled className="input" />
         </div>
 
-        <div>
-          <label htmlFor="kra_pin" className="input-label">
-            KRA PIN
-          </label>
-          <input
-            id="kra_pin"
-            name="kra_pin"
-            type="text"
-            placeholder="A123456789Z"
-            maxLength={11}
-            className="input"
-          />
-          {errors.kra_pin && (
-            <p className="mt-1 text-xs text-red-500">{errors.kra_pin}</p>
-          )}
-        </div>
 
         <div>
           <label htmlFor="description" className="input-label">

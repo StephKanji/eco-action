@@ -5,6 +5,7 @@ import OrgOnboardingTour from './org-onboarding-tour'
 import Link from 'next/link'
 import TaskFilterView from './task-filter-view'
 import { getOrgTasks } from '@/lib/org-tasks'
+import { requireRole } from '@/lib/auth/guard'
 
 export default async function OrgOverviewPage() {
   const supabase = await createClient()
@@ -20,6 +21,8 @@ export default async function OrgOverviewPage() {
     .single()
 
   if (!org) redirect('/login')
+
+ const {role} = await requireRole(['org'])
 
   const activeTasks = await getOrgTasks(org.id, 'active')
 
