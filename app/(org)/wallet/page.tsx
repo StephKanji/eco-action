@@ -1,8 +1,8 @@
-// app/organization/wallet/page.tsx
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import BuyPointsPanel from './buy-points-panel'
+import OrgWalletBalances from './org-wallet-balances'
 
 export default async function WalletPage() {
   const supabase = await createClient()
@@ -32,16 +32,12 @@ export default async function WalletPage() {
         <p className="text-xs text-gray-400 mt-1">user: {org.org_name}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="stat-card">
-          <p className="stat-card-value">{org.points_balance.toLocaleString()}</p>
-          <p className="stat-card-label">Available Points</p>
-        </div>
-        <div className="stat-card">
-          <p className="stat-card-value">{org.escrow_balance.toLocaleString()}</p>
-          <p className="stat-card-label">In Escrow</p>
-        </div>
-      </div>
+      {/* Live-updating balance cards */}
+      <OrgWalletBalances
+        orgId={org.id}
+        initialPoints={org.points_balance}
+        initialEscrow={org.escrow_balance}
+      />
 
       <BuyPointsPanel packages={packages ?? []} />
     </div>

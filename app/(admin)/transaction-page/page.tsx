@@ -1,8 +1,7 @@
-// app/(admin)/transaction-page/page.tsx
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import TransactionHistoryView from '@/components/transactions/transaction-history-view'
+import LiveTransactionHistory from '@/components/transactions/live-transaction-history'
 
 export default async function TransactionsPage() {
   const supabase = await createClient()
@@ -32,7 +31,11 @@ export default async function TransactionsPage() {
         <p className="text-xs text-gray-400 mt-1">Full points ledger, most recent first</p>
       </div>
 
-      <TransactionHistoryView transactions={transactions ?? []} />
+      <LiveTransactionHistory
+        entityId={null}
+        entityType="admin"
+        initialTransactions={transactions ?? []}
+      />
     </div>
   )
 }

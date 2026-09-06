@@ -2,6 +2,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 type Reward = {
   id: string
@@ -18,6 +19,7 @@ export default function RedeemPanel({
   rewards: Reward[]
   currentPoints: number
 }) {
+  const router = useRouter()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [phoneNumber, setPhoneNumber] = useState('')
   const [loading, setLoading] = useState(false)
@@ -54,6 +56,9 @@ export default function RedeemPanel({
       }
 
       setSuccess(data.message ?? 'Airtime sent successfully.')
+      setSelectedId(null)
+      setPhoneNumber('')
+      router.refresh()
       setLoading(false)
     } catch {
       setError('Could not reach the server. Please try again.')

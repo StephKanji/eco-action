@@ -1,8 +1,7 @@
-// app/(user)/transactions/page.tsx
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
-import TransactionHistoryView from '@/components/transactions/transaction-history-view'
+import LiveTransactionHistory from '@/components/transactions/live-transaction-history'
 
 export default async function TransactionHistoryPage() {
   const supabase = await createClient()
@@ -33,7 +32,11 @@ export default async function TransactionHistoryPage() {
         <p className="page-subtitle">Every points movement on your account</p>
       </div>
 
-      <TransactionHistoryView transactions={transactions ?? []} />
+      <LiveTransactionHistory
+        entityId={user.id}
+        entityType="user"
+        initialTransactions={transactions ?? []}
+      />
     </div>
   )
 }

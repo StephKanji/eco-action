@@ -66,9 +66,20 @@ export async function POST(request: Request) {
   try {
     const result = await sendAirtime(phoneNumber, reward.value_kes)
 
-    const recipientResult = result?.responses?.[0]
-    if (recipientResult?.status !== 'Sent' && recipientResult?.status !== 'Queued') {
-      throw new Error(recipientResult?.errorMessage || 'Airtime send failed')
+    console.log('AT airtime result:', JSON.stringify(result, null, 2))
+
+    // AT wraps results differently depending on version — handle both shapes
+    const responses = result?.responses ?? result?.Response?.responses ?? []
+    const recipientResult = responses[0]
+
+    // AT sandbox returns 'Sent' on success; some versions return 'Success'
+    const successStatuses = ['Sent', 'Queued', 'Success']
+    if (!recipientResult || !successStatuses.includes(recipientResult.status)) {
+      throw new Error(
+        recipientResult?.errorMessage ||
+        recipientResult?.status ||
+        `Unexpected AT response: ${JSON.stringify(result)}`
+      )
     }
 
     return NextResponse.json({
@@ -76,8 +87,8 @@ export async function POST(request: Request) {
       message: `KES ${reward.value_kes} airtime sent to ${phoneNumber}`,
       details: recipientResult,
     })
-  } catch (err) {
-    console.error('Airtime send failed, reversing deduction:', err)
+  } catch (err: any) {
+    console.error('Airtime send failed:', err?.message ?? err)
 
     // Step 3: reverse the deduction since airtime never actually went out
     await adminClient.from('point_transactions').insert({
@@ -91,7 +102,7 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(
-      { error: 'Airtime delivery failed. Your points have been refunded.' },
+      { error: `Airtime delivery failed: ${err?.message ?? 'Unknown error'}. Your points have been refunded.` },
       { status: 502 }
     )
   }

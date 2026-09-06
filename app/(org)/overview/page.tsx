@@ -3,9 +3,10 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import OrgOnboardingTour from './org-onboarding-tour'
 import Link from 'next/link'
-import TaskFilterView from './task-filter-view'
+import LiveTaskFilterView from './live-task-filter-view'
 import { getOrgTasks } from '@/lib/org-tasks'
 import { requireRole } from '@/lib/auth/guard'
+import OrgWalletBalances from '../wallet/org-wallet-balances'
 
 export default async function OrgOverviewPage() {
   const supabase = await createClient()
@@ -108,24 +109,21 @@ export default async function OrgOverviewPage() {
             <div className="profile-card-header">
               <p className="profile-card-title">Task Progress</p>
             </div>
-            <TaskFilterView
+            <LiveTaskFilterView
+              orgId={org.id}
               activeCount={totalActiveCount}
-              pendingReviews={pendingReviews ?? 0}
-              pendingChallengeReviews={pendingChallengeReviews ?? 0}
+              initialPendingReviews={pendingReviews ?? 0}
+              initialPendingChallengeReviews={pendingChallengeReviews ?? 0}
             />
           </div>
 
           {/* Points row */}
           <div>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="stat-card">
-                <p className="stat-card-value">{org.points_balance.toLocaleString()}</p>
-                <p className="stat-card-label">Your Available Points</p>
-              </div>
-              <div className="stat-card">
-                <p className="stat-card-value">{org.escrow_balance.toLocaleString()}</p>
-                <p className="stat-card-label">Locked for Tasks</p>
-              </div>
+            <OrgWalletBalances
+              orgId={org.id}
+              initialPoints={org.points_balance}
+              initialEscrow={org.escrow_balance}
+            />
               <Link href="/wallet/history" className="card-strong">
                 <div className="flex items-center gap-3">
                   <div>
