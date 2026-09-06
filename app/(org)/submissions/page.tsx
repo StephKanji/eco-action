@@ -62,11 +62,8 @@ export default async function OrgSubmissionsPage() {
 
       {/* Header */}
       <div className="mb-8">
-        <Link href="/overview" className="text-sm text-gray-500 hover:text-gray-700">
-          ← Back to Dashboard
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-900 mt-2">Submission Review</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-gray-900">Submission Review</h1>
+        <p className="text-sm text-gray-500">
           {submissions?.length ?? 0} pending review
         </p>
       </div>
@@ -91,7 +88,7 @@ export default async function OrgSubmissionsPage() {
 
             return (
               <div key={sub.id}
-                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+                className="rounded-2xl border border-gray-100 bg-transparent p-5 shadow-sm">
 
                 {/* Task name + reward */}
                 <div className="flex items-start justify-between mb-4">
@@ -134,7 +131,7 @@ export default async function OrgSubmissionsPage() {
       {reviewed && reviewed.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Recently Reviewed
+            Reviewed
           </h2>
           <div className="space-y-2">
             {reviewed.map(sub => {

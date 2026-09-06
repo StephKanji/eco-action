@@ -35,8 +35,8 @@ export function ApproveButton({ submissionId, orgId }: ReviewButtonProps) {
     <button
       onClick={handle}
       disabled={loading}
-      className="w-full py-2.5 rounded-xl bg-green-600 text-white text-sm 
-                 font-semibold hover:bg-green-700 transition-colors
+      className="w-full py-2.5 rounded-xl bg-green-50 text-green-600 border border-green-200 text-sm 
+                 font-semibold hover:bg-green-100 transition-colors
                  disabled:opacity-50"
     >
       {loading ? 'Approving...' : '✅ Approve'}
@@ -92,8 +92,8 @@ export function RejectButton({ submissionId, orgId }: ReviewButtonProps) {
             <button
               onClick={handle}
               disabled={loading}
-              className="flex-1 py-2 rounded-xl bg-red-500 text-white 
-                         text-sm font-semibold hover:bg-red-600 transition-colors
+              className="flex-1 py-2 rounded-xl bg-red-50 text-red-600 border border-red-200 text-sm 
+                         font-semibold hover:bg-red-100 transition-colors
                          disabled:opacity-50"
             >
               {loading ? 'Rejecting...' : 'Confirm'}

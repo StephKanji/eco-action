@@ -88,12 +88,12 @@ export function BadgeList({ userId, initialBadges }: BadgeListProps) {
           <p className="text-sm">Complete tasks to earn badges</p>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-5 gap-3">
           {badges.map(badge => (
             <div
               key={badge.milestone_key}
-              className="flex flex-col items-center text-center p-3
-                         rounded-2xl bg-gray-50 border border-gray-100"
+              className="flex flex-col items-center text-center p-1
+                         rounded-2xl bg-transparent"
             >
               <span className="text-3xl mb-1">{badge.icon}</span>
               <p className="text-xs font-semibold text-gray-800 leading-tight">

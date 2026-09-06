@@ -36,13 +36,16 @@ export default async function OrgOverviewPage() {
     .from('community_challenges')
     .select('*', { count: 'exact', head: true })
     .eq('org_id', org.id)
-    .eq('status', 'active')
+    .in('status', ['active', 'upcoming'])
 
   const { count: pendingChallengeReviews } = await adminClient
     .from('challenge_submissions')
     .select('*, community_challenges!inner(org_id)', { count: 'exact', head: true })
     .eq('community_challenges.org_id', org.id)
     .eq('status', 'pending')
+
+  // Combined total: active individual tasks + active community challenges
+  const totalActiveCount = activeTasks.length + (activeChallenges ?? 0)
 
   const statusStyles: Record<string, { label: string; color: string }> = {
     pending: { label: 'Pending Review', color: 'bg-yellow-100 text-yellow-700' },
@@ -106,7 +109,7 @@ export default async function OrgOverviewPage() {
               <p className="profile-card-title">Task Progress</p>
             </div>
             <TaskFilterView
-              activeCount={activeTasks.length}
+              activeCount={totalActiveCount}
               pendingReviews={pendingReviews ?? 0}
               pendingChallengeReviews={pendingChallengeReviews ?? 0}
             />
@@ -117,12 +120,13 @@ export default async function OrgOverviewPage() {
             <div className="grid grid-cols-2 gap-3">
               <div className="stat-card">
                 <p className="stat-card-value">{org.points_balance.toLocaleString()}</p>
-                <p className="stat-card-label">Available Points</p>
+                <p className="stat-card-label">Your Available Points</p>
               </div>
               <div className="stat-card">
                 <p className="stat-card-value">{org.escrow_balance.toLocaleString()}</p>
-                <p className="stat-card-label">In Escrow</p>
+                <p className="stat-card-label">Locked for Tasks</p>
               </div>
+      
             </div>
           </div>
 

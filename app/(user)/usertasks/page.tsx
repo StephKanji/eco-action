@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { TaskChallengeTabs } from '@/components/tabs/task-challenge-tabs'
 
 const CATEGORY_LABELS: Record<string, string> = {
   tree_planting:      ' Tree Planting',
@@ -77,7 +78,11 @@ export default async function TaskFeedPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mt">
+       <div className="pt-15">
+
+<TaskChallengeTabs />
+     </div>
 
       {/* Header */}
       <div>
@@ -85,22 +90,7 @@ export default async function TaskFeedPage() {
         <p className="page-subtitle">Complete tasks or join community challenges to earn points</p>
       </div>
 
-      {/* Tab bar — Tasks is active here, Challenges links out */}
-      <div className="flex gap-1 p-1 rounded-full">
-        <span
-          className="px-4 py-2 rounded-full btn-ghost:hover
-                     bg-white text-green-700 shadow-sm"
-        >
-          Tasks
-        </span>
-        <Link
-          href="/challenges"
-          className="px-4 py-2 rounded-full btn-ghost:hover
-                     bg-white text-green-700 shadow-sm"
-        >
-          Challenges
-        </Link>
-      </div>
+    
 
       {/* Task list */}
       {!tasks || tasks.length === 0 ? (
@@ -110,7 +100,7 @@ export default async function TaskFeedPage() {
           <p className="text-sm text-gray-400 mt-1">Check back soon — new tasks are added regularly.</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {tasks.map(task => {
             const deadline = new Date(task.deadline)
             const daysLeft = Math.ceil(
@@ -143,7 +133,7 @@ export default async function TaskFeedPage() {
                   </div>
                 </div>
 
-                <p className="text-sm text-gray-500 line-clamp-2 mb-3">
+                <p className="text-sm text-gray-500 line-clamp-2 mb-4">
                   {task.description}
                 </p>
 
@@ -195,10 +185,11 @@ export default async function TaskFeedPage() {
                 <div
                   key={task.id}
                   aria-disabled="true"
-                  className="block rounded-2xl border border-gray-100 bg-white p-5
-                             opacity-60 cursor-not-allowed"
+                  className="m-5 space-y-4 opacity-60 cursor-not-allowed"
                 >
-                  {cardContent}
+                  <div className="p-5 btn-ghost space-y-4">
+                    {cardContent}
+                  </div>
                 </div>
               )
             }
@@ -207,11 +198,11 @@ export default async function TaskFeedPage() {
               <Link
                 key={task.id}
                 href={`/usertasks/${task.id}`}
-                className="block rounded-2xl border border-gray-100 bg-white p-5
-                           shadow-sm hover:shadow-md hover:border-green-200
-                           transition-all duration-200"
+                className="m-5 space-y-4"
               >
-                {cardContent}
+                <div className="p-5 btn-ghost space-y-4">
+                  {cardContent}
+                </div>
               </Link>
             )
           })}

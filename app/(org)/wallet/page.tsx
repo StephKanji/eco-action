@@ -28,8 +28,8 @@ export default async function WalletPage() {
   return (
     <div className="space-y-6 hero-root pt-10">
       <div>
-        <h1 className="page-title">Wallet</h1>
-        <p className="text-xs text-gray-400 mt-1">{org.org_name}</p>
+        <h1 className="page-title">Explore your Wallet</h1>
+        <p className="text-xs text-gray-400 mt-1">user: {org.org_name}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">

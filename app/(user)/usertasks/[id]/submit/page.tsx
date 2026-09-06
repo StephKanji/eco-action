@@ -105,9 +105,9 @@ export default function SubmitProofPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-50 px-4 py-8">
+    <div className="max-w-md mx-auto mt-2 px-4">
 
-      <div className="mt-6 space-y-6">
+      <div className=" space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Submit Proof</h1>
           <p className="text-sm text-gray-500 mt-1">

@@ -60,14 +60,15 @@ export default function CompleteOrgForm() {
   }
 
   return (
-    <div className='hero-section pt-30'>
+    <div className='hero-section pt-5'>
 
       <div>
-        <h1 className="hero-title" style={{ fontSize: 'clamp(1.2rem, 3vw, 2.1rem)', marginBottom: '6px' }}>
-          Almost there, <em>{orgName || 'friend'}</em>
+        <h1 className="hero-title" style={{ fontSize: 'clamp(1.6rem, 3vw, 3.0rem)', marginBottom: '6px' }}>
+          Almost there, <em>{orgName || 'Activist'}</em>
         </h1>
+        
         <p className="hero-subtitle">
-          Just add your a short description, and we'll submit your organisation for admin review.
+          Add a short description, and we'll submit your organisation for admin review.
         </p>
       </div>
 

@@ -24,7 +24,6 @@ const CATEGORIES = [
 const PROOF_TYPES = [
   { value: 'photo',       label: ' Photo Upload' },
   { value: 'gps_checkin', label: ' GPS Check-in' },
-  { value: 'qr_scan',     label: ' QR Scan for attendance' },
   { value: 'receipt',     label: ' Receipt' },
 ]
 
@@ -126,7 +125,7 @@ export default function NewTaskPage() {
   }
 
   return (
-    <div className="hero-root pt-17">
+    <div className="hero-root pt-8">
 
       {/* Header */}
       <div className="mb-8">

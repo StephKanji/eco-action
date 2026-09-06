@@ -6,6 +6,7 @@ import { WalletCard } from '@/components/wallet/wallet-card'
 import { BadgeList } from '@/components/badges/badges-list'
 import UserOnboardingTour from './user-onboarding-tour'
 import { requireRole } from '@/lib/auth/guard'
+import { ImpactTally } from '@/components/profile/impact-tally'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -47,6 +48,18 @@ export default async function ProfilePage() {
     icon:          (b.badges as any).icon,
   }))
 
+  const { data: impactData } = await adminClient
+  .from('task_submissions')
+  .select('tasks!inner(category)')
+  .eq('user_id', user.id)
+  .eq('status', 'approved')
+
+const impactByCategory = (impactData ?? []).reduce((acc, row) => {
+  const category = (row.tasks as any)?.category ?? 'other'
+  acc[category] = (acc[category] ?? 0) + 1
+  return acc
+}, {} as Record<string, number>)
+
   const { data: submissions } = await adminClient
     .from('task_submissions')
     .select('status')
@@ -82,6 +95,15 @@ export default async function ProfilePage() {
         </Link></div>
       </div>
 
+       {/* ── Badges ───────────────────────────────────── */}
+      <div >
+        <div className="profile-card-header">
+          <p className="profile-card-title">Badges</p>
+        </div>
+        <BadgeList userId={user.id} initialBadges={badges} />
+      </div>
+
+
       {/* Streaks */}
       <div className='profile-streak-row'>
         <div >
@@ -94,6 +116,24 @@ export default async function ProfilePage() {
           <p className="profile-streak-value">{userRow?.longest_streak ?? 0}</p>
           
         </div>
+      </div>
+
+      {/* ── CTAs  */}
+     
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-2">
+        <Link
+          href="/usertasks"
+          className="btn btn-primary justify-center py-3 rounded-xl text-sm"
+        >
+           Explore More Tasks
+        </Link>
+        
+        <Link
+          href="/transactions"
+          className="btn btn-primary justify-center py-3 rounded-xl text-sm"
+        >
+          Transaction History
+        </Link>
       </div>
 
       {/* ── Task Progress ────────────────────────────── */}
@@ -132,31 +172,10 @@ export default async function ProfilePage() {
         </div>
       )}
 
-      {/* ── Badges ───────────────────────────────────── */}
-      <div >
-        <div className="profile-card-header">
-          <p className="profile-card-title">Badges</p>
-        </div>
-        <BadgeList userId={user.id} initialBadges={badges} />
-      </div>
+      <ImpactTally impactByCategory={impactByCategory} />
 
-      {/* ── CTAs  */}
      
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 pt-2">
-        <Link
-          href="/usertasks"
-          className="btn btn-primary justify-center py-3 rounded-xl text-sm"
-        >
-           Explore More Tasks
-        </Link>
-        
-        <Link
-          href="/transactions"
-          className="btn btn-primary justify-center py-3 rounded-xl text-sm"
-        >
-          Transaction History
-        </Link>
-      </div>
+      
     </div>
     </div>
   )

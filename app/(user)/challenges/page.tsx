@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { TaskChallengeTabs } from '@/components/tabs/task-challenge-tabs'
 
 const CATEGORY_LABELS: Record<string, string> = {
   tree_planting:      ' Tree Planting',
@@ -10,15 +11,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   clean_energy:       ' Clean Energy',
   water_conservation: ' Water Conservation',
   other:              ' Other',
-}
-
-const UNIT_LABELS: Record<string, string> = {
-  trees:           'trees',
-  kg_waste:        'kg waste',
-  kg_plastic:      'kg plastic',
-  kwh_saved:       'kwh saved',
-  litres_saved:    'litres saved',
-  tasks_completed: 'tasks',
 }
 
 export default async function ChallengeFeedPage() {
@@ -33,7 +25,6 @@ export default async function ChallengeFeedPage() {
     .from('community_challenges')
     .select(`
       id, title, description, category,
-      target_value, target_unit, current_progress,
       reward_pool, participant_count,
       start_date, end_date, status,
       cover_image_url,
@@ -52,6 +43,10 @@ export default async function ChallengeFeedPage() {
 
   return (
     <div className="space-y-6">
+      <div className="pt-15">
+   <TaskChallengeTabs />
+   </div>
+
 
       {/* Header */}
       <div>
@@ -61,23 +56,6 @@ export default async function ChallengeFeedPage() {
         </p>
       </div>
 
-      {/* Tab bar — Tasks is active here, Challenges links out */}
-      <div className="flex gap-1 p-1 btn-ghost:hover rounded-full">
-        <Link
-          href="/usertasks"
-          className="px-4 py-2 rounded-full btn-ghost:hover
-                     bg-white text-green-700 shadow-sm"
-        >
-          Tasks
-        </Link>
-        <Link
-          href="/challenges"
-          className="px-4 py-2 rounded-full btn-ghost:hover
-                     bg-white text-green-700 shadow-sm"
-        >
-          Challenges
-        </Link>
-      </div>
 
       {/* Empty state */}
       {!challenges || challenges.length === 0 ? (
@@ -98,10 +76,6 @@ export default async function ChallengeFeedPage() {
             const isUpcoming  = challenge.status === 'upcoming'
             const daysLeft    = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
             const daysToStart = Math.ceil((startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-            const progressPct = Math.min(
-              Math.round((Number(challenge.current_progress) / Number(challenge.target_value)) * 100),
-              100
-            )
             const hasJoined   = joinedIds.has(challenge.id)
 
             return (
@@ -135,28 +109,6 @@ export default async function ChallengeFeedPage() {
                   <p className="text-sm text-gray-500 line-clamp-2 mb-4">
                     {challenge.description}
                   </p>
-
-                  {/* Progress bar — only for active challenges */}
-                  {!isUpcoming && (
-                    <div className="mb-4">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-xs text-gray-500">
-                          {Number(challenge.current_progress).toLocaleString()} /
-                          {' '}{Number(challenge.target_value).toLocaleString()}
-                          {' '}{UNIT_LABELS[challenge.target_unit] ?? challenge.target_unit}
-                        </span>
-                        <span className="text-xs font-semibold text-green-600">
-                          {progressPct}%
-                        </span>
-                      </div>
-                      <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-green-500 transition-all duration-500"
-                          style={{ width: `${progressPct}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
 
                   {/* Tags row */}
                   <div className="flex flex-wrap items-center gap-2">

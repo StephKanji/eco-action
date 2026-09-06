@@ -4,7 +4,7 @@ import { Navbar } from '@/components/navbar'
 export default function Home() {
   return (
     <div>
-    <Navbar/>
+    <Navbar className="bg-white-900" />
       <HomeHero />
     </div>
   )

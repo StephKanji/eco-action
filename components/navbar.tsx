@@ -1,8 +1,8 @@
 import Image from "next/image"
 import Link from "next/link"
+import { Settings } from "lucide-react"
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { LogoutButton } from './LogoutButton'
 
 const TIER_LABELS: Record<number, { label: string; icon: string; color: string }> = {
   1: { label: 'Seedling',  icon: '🌱', color: 'text-green-700'   },
@@ -50,9 +50,6 @@ export const Navbar = async () => {
   const isUser = profile?.role === 'user'
   const isOrg  = profile?.role === 'org'
 
-  // Only show the profile pill once a role has actually been assigned —
-  // an authenticated user mid-flow on /redirect (no profile row yet), or
-  // an admin (no dedicated frontend surface yet), gets Logout only.
   const showProfilePill = isUser || isOrg
 
   const displayName  = isOrg
@@ -74,24 +71,31 @@ export const Navbar = async () => {
     <nav className="w-full fixed top-0 left-0 right-0 z-50">
       <header className="hero-header bg-transparent p-15">
 
-        {/* Logo */}
-        <Link href="/" className="flex items-center logo">
-          <Image src="/nobglogo2.png" alt="EcoTrack Logo" width={100} height={100} />
+        {/* Logo — shrinks on small screens, h-auto keeps aspect ratio intact */}
+        <Link href="/" className="flex items-center logo shrink-0">
+          <Image
+            src="/nobglogo2.png"
+            alt="EcoTrack Logo"
+            width={120}
+            height={100}
+            className="w-[72px] h-auto sm:w-[100px] md:w-[120px] object-contain"
+            priority
+          />
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {user ? (
             <>
               {showProfilePill && (
                 <Link
                   href={profileHref}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-2xl
+                  className="flex items-center gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-2xl
                              bg-green-50 border border-green-200 hover:bg-green-100
                              transition-colors group"
                 >
                   {/* Avatar initial */}
                   <span
-                    className="w-7 h-7 rounded-full bg-green-600 text-white text-xs
+                    className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-green-600 text-white text-xs
                                font-bold flex items-center justify-center shrink-0"
                   >
                     {initial}
@@ -131,7 +135,18 @@ export const Navbar = async () => {
                 </Link>
               )}
 
-              <LogoutButton />
+              {/* Settings now owns logout + account deletion + profile editing —
+                  always reachable, even for a user with no profile row yet
+                  (mid-/redirect), since they still need a way to log out. */}
+              <Link
+                href="/settings"
+                aria-label="Settings"
+                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full
+                           text-gray-500 hover:text-gray-700 hover:bg-gray-100
+                           border border-transparent hover:border-gray-200 transition-colors"
+              >
+                <Settings size={18} />
+              </Link>
             </>
           ) : (
             <>

@@ -4,15 +4,6 @@ import { redirect } from 'next/navigation'
 import { ChallengeReviewButton } from '@/components/challenges/challenge-review-button'
 import Link from 'next/link'
 
-const UNIT_LABELS: Record<string, string> = {
-  trees:           'trees',
-  kg_waste:        'kg waste',
-  kg_plastic:      'kg plastic',
-  kwh_saved:       'kwh saved',
-  litres_saved:    'litres saved',
-  tasks_completed: 'tasks',
-}
-
 export default async function ChallengeSubmissionsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -33,9 +24,10 @@ export default async function ChallengeSubmissionsPage() {
     .from('challenge_submissions')
     .select(`
       id, status, contribution, submitted_at, proof_url,
+      submitted_lat, submitted_lng,
       rejection_reason, proof_metadata,
       community_challenges!inner (
-        id, title, target_unit, org_id
+        id, title, proof_type, org_id
       ),
       users!inner (
         id,
@@ -94,7 +86,7 @@ export default async function ChallengeSubmissionsPage() {
               const challenge = sub.community_challenges as any
               const userInfo  = sub.users as any
               const name      = userInfo?.profiles?.display_name ?? 'Unknown User'
-              const unit      = UNIT_LABELS[challenge?.target_unit] ?? challenge?.target_unit
+              const isGps     = challenge?.proof_type === 'gps_checkin'
 
               return (
                 <div key={sub.id} className="card space-y-4">
@@ -108,28 +100,43 @@ export default async function ChallengeSubmissionsPage() {
                       <p className="text-lg font-bold text-green-600">
                         +{sub.contribution}
                       </p>
-                      <p className="text-xs text-gray-400">{unit}</p>
                     </div>
                   </div>
 
-                  {/* Proof image */}
-                  {sub.proof_url && (
-                    <a
-                      href={sub.proof_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block rounded-xl overflow-hidden border border-gray-100
-                                 hover:border-green-200 transition-colors"
-                    >
-                      <img
-                        src={sub.proof_url}
-                        alt="Proof"
-                        className="w-full h-48 object-cover"
-                      />
-                      <p className="text-xs text-gray-400 text-center py-1.5">
-                        Tap to open full image ↗
-                      </p>
-                    </a>
+                  {/* Proof — image or GPS coordinates depending on challenge type */}
+                  {isGps ? (
+                    sub.submitted_lat && sub.submitted_lng && (
+                      <a
+                        href={`https://www.google.com/maps?q=${sub.submitted_lat},${sub.submitted_lng}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 p-3 rounded-xl bg-blue-50 border border-blue-100 hover:border-blue-300 transition-colors"
+                      >
+                        <span className="text-blue-600">📍</span>
+                        <span className="text-sm text-blue-700">
+                          {sub.submitted_lat.toFixed(5)}, {sub.submitted_lng.toFixed(5)}
+                        </span>
+                        <span className="text-xs text-blue-400 ml-auto">View on map ↗</span>
+                      </a>
+                    )
+                  ) : (
+                    sub.proof_url && (
+                      <a
+                        href={sub.proof_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block rounded-xl overflow-hidden border border-gray-100 hover:border-green-200 transition-colors"
+                      >
+                        <img
+                          src={sub.proof_url}
+                          alt="Proof"
+                          className="w-full h-48 object-cover"
+                        />
+                        <p className="text-xs text-gray-400 text-center py-1.5">
+                          Tap to open full image ↗
+                        </p>
+                      </a>
+                    )
                   )}
 
                   {/* Notes */}
@@ -167,13 +174,11 @@ export default async function ChallengeSubmissionsPage() {
               const challenge = sub.community_challenges as any
               const userInfo  = sub.users as any
               const name      = userInfo?.profiles?.display_name ?? 'Unknown User'
-              const unit      = UNIT_LABELS[challenge?.target_unit] ?? challenge?.target_unit
 
               return (
                 <div
                   key={sub.id}
-                  className="flex items-center justify-between p-3 rounded-xl
-                             bg-gray-50 border border-gray-100"
+                  className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100"
                 >
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">{name}</p>
@@ -181,10 +186,9 @@ export default async function ChallengeSubmissionsPage() {
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
                     <span className="text-sm font-semibold text-gray-700">
-                      +{sub.contribution} {unit}
+                      +{sub.contribution}
                     </span>
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium
-                      ${sub.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${sub.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                       {sub.status}
                     </span>
                   </div>

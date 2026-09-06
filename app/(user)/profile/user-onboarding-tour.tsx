@@ -4,24 +4,24 @@ import { useEffect, useState } from 'react'
 
 const TOUR_STEPS = [
   {
-    title: 'Welcome to the Admin Dashboard',
+    title: 'Welcome to Your Dashboard',
     description:
-      "This is where you review organisation registrations and keep an eye on the platform's points ledger. Let's walk through the essentials — takes less than a minute.",
+      "This is where you explore and complete tasks to get rewards",
   },
   {
     title: 'Your stats at a glance',
     description:
-      'The three cards up top show how many organisations are pending, verified, or rejected — updated live, no refresh needed.',
+      'Keep track of your reward points and streaks at a glance.',
   },
   {
-    title: 'Reviewing new organisations',
+    title: 'Redeem your points',
     description:
-      'Every pending organisation appears as a card below with their full details. Approve or reject right from the card — rejections let you leave a reason for the organisation.',
+      'Use the "Redeem Points" button at the top right to redeem your points for rewards.',
   },
   {
-    title: 'Tracking every transaction',
+    title: 'Explore Challenges',
     description:
-      'Use "View Transactions" in the top right any time to see the full points ledger — purchases, escrow moves, and redemptions, all in one place.',
+      'Discover exciting challenges to complete and earn rewards.',
   },
 ]
 

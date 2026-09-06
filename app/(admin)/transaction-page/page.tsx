@@ -6,9 +6,9 @@ import { redirect } from 'next/navigation'
 const TYPE_STYLES: Record<string, { label: string; color: string }> = {
   purchase: { label: 'Purchase', color: 'bg-green-100 text-green-700' },
   starter_grant: { label: 'Starter Grant', color: 'bg-blue-100 text-blue-700' },
-  escrow_lock: { label: 'Escrow Lock', color: 'bg-yellow-100 text-yellow-700' },
-  escrow_release: { label: 'Escrow Release', color: 'bg-green-100 text-green-700' },
-  escrow_return: { label: 'Escrow Return', color: 'bg-gray-100 text-gray-700' },
+  escrow_lock: { label: 'Locked for Tasks', color: 'bg-yellow-100 text-yellow-700' },
+  escrow_release: { label: 'Task Completion', color: 'bg-green-100 text-green-700' },
+  escrow_return: { label: 'Task Cancellation', color: 'bg-gray-100 text-gray-700' },
   reward_credit: { label: 'Reward Credit', color: 'bg-green-100 text-green-700' },
   redemption: { label: 'Redemption', color: 'bg-red-100 text-red-700' },
 }

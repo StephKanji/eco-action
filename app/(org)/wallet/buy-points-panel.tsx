@@ -51,7 +51,7 @@ export default function BuyPointsPanel({ packages }: { packages: Package[] }) {
 
   return (
     <div>
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
         Buy Points
       </p>
 

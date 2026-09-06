@@ -1,7 +1,4 @@
 // app/api/challenges/submit/route.ts
-// User submits proof for a challenge they have joined.
-// Uploads proof image to Supabase Storage, inserts challenge_submissions row.
-
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -9,8 +6,10 @@ import { z } from 'zod'
 
 const SubmitSchema = z.object({
   challenge_id: z.string().uuid(),
-  contribution: z.number().positive(), // amount contributed toward target
-  proof_metadata: z.object({           // client-collected metadata
+  contribution: z.number().positive(),
+  submitted_lat: z.number().optional(),
+  submitted_lng: z.number().optional(),
+  proof_metadata: z.object({
     lat:          z.number().optional(),
     lng:          z.number().optional(),
     captured_at:  z.string().optional(),
@@ -29,20 +28,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // ── Parse multipart form (proof image + JSON fields) ─────
-    const formData     = await req.formData()
-    const file         = formData.get('proof') as File | null
-    const jsonStr      = formData.get('data') as string | null
-
-    if (!file) {
-      return NextResponse.json({ error: 'Proof image is required' }, { status: 400 })
-    }
+    // ── Parse multipart form (proof image is optional now — only
+    //    required for photo-based challenges, not GPS check-ins) ─
+    const formData = await req.formData()
+    const file      = formData.get('proof') as File | null
+    const jsonStr   = formData.get('data') as string | null
 
     if (!jsonStr) {
       return NextResponse.json({ error: 'Submission data is required' }, { status: 400 })
     }
 
-    // ── Validate JSON fields ─────────────────────────────────
     let parsedData: z.infer<typeof SubmitSchema>
     try {
       parsedData = SubmitSchema.parse(JSON.parse(jsonStr))
@@ -50,12 +45,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid submission data' }, { status: 400 })
     }
 
-    const { challenge_id, contribution, proof_metadata } = parsedData
+    const { challenge_id, contribution, proof_metadata, submitted_lat, submitted_lng } = parsedData
 
-    // ── Verify challenge is active ───────────────────────────
+    // ── Verify challenge is active, and get its proof_type ───
     const { data: challenge } = await adminClient
       .from('community_challenges')
-      .select('id, status, end_date, target_unit')
+      .select('id, status, end_date, proof_type')
       .eq('id', challenge_id)
       .single()
 
@@ -69,6 +64,17 @@ export async function POST(req: NextRequest) {
 
     if (new Date(challenge.end_date) < new Date()) {
       return NextResponse.json({ error: 'Challenge has expired' }, { status: 400 })
+    }
+
+    // ── Validate proof matches what this challenge requires ──
+    if (challenge.proof_type === 'gps_checkin') {
+      if (submitted_lat === undefined || submitted_lng === undefined) {
+        return NextResponse.json({ error: 'Location check-in is required' }, { status: 400 })
+      }
+    } else {
+      if (!file) {
+        return NextResponse.json({ error: 'Proof image is required' }, { status: 400 })
+      }
     }
 
     // ── Verify user has joined this challenge ────────────────
@@ -86,29 +92,50 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // ── Upload proof image to Supabase Storage ───────────────
-    const fileExt     = file.name.split('.').pop() ?? 'jpg'
-    const fileName    = `${challenge_id}/${user.id}/${Date.now()}.${fileExt}`
-    const arrayBuffer = await file.arrayBuffer()
+    // ── Prevent duplicate submissions while one is still pending ─
+    const { data: existingSubmission } = await adminClient
+      .from('challenge_submissions')
+      .select('id')
+      .eq('challenge_id', challenge_id)
+      .eq('user_id', user.id)
+      .eq('status', 'pending')
+      .maybeSingle()
 
-    const { error: uploadError } = await adminClient
-      .storage
-      .from('challenge-proofs')
-      .upload(fileName, arrayBuffer, {
-        contentType: file.type,
-        upsert: false,
-      })
-
-    if (uploadError) {
-      console.error('Storage upload error:', uploadError)
-      return NextResponse.json({ error: 'Failed to upload proof image' }, { status: 500 })
+    if (existingSubmission) {
+      return NextResponse.json(
+        { error: 'You already have a submission pending review for this challenge' },
+        { status: 409 }
+      )
     }
 
-    // ── Get public URL ───────────────────────────────────────
-    const { data: { publicUrl } } = adminClient
-      .storage
-      .from('challenge-proofs')
-      .getPublicUrl(fileName)
+    // ── Upload proof image, only if one was provided ─────────
+    let publicUrl: string | null = null
+
+    if (file) {
+      const fileExt     = file.name.split('.').pop() ?? 'jpg'
+      const fileName    = `${challenge_id}/${user.id}/${Date.now()}.${fileExt}`
+      const arrayBuffer = await file.arrayBuffer()
+
+      const { error: uploadError } = await adminClient
+        .storage
+        .from('challenge-proofs')
+        .upload(fileName, arrayBuffer, {
+          contentType: file.type,
+          upsert: false,
+        })
+
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError)
+        return NextResponse.json({ error: 'Failed to upload proof image' }, { status: 500 })
+      }
+
+      const { data } = adminClient
+        .storage
+        .from('challenge-proofs')
+        .getPublicUrl(fileName)
+
+      publicUrl = data.publicUrl
+    }
 
     // ── Insert submission row ────────────────────────────────
     const { data: submission, error: insertError } = await adminClient
@@ -118,6 +145,8 @@ export async function POST(req: NextRequest) {
         user_id:        user.id,
         proof_url:      publicUrl,
         proof_metadata: proof_metadata ?? {},
+        submitted_lat:  submitted_lat ?? null,
+        submitted_lng:  submitted_lng ?? null,
         contribution,
         status:         'pending',
       })

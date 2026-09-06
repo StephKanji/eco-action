@@ -56,7 +56,7 @@ export default function RedirectPage() {
 
   return (
     <div>
-      <section className=" hero-root hero-section">
+      <section className=" hero-root hero-section pt-5">
 
         <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', marginBottom: '8px' }}>
           How will you <em>make an impact?</em>

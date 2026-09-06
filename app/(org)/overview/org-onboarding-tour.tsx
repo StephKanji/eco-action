@@ -4,24 +4,24 @@ import { useEffect, useState } from 'react'
 
 const TOUR_STEPS = [
   {
-    title: 'Welcome to the Admin Dashboard',
+    title: 'Welcome to your Organizations Dashboard',
     description:
-      "This is where you review organisation registrations and keep an eye on the platform's points ledger. Let's walk through the essentials — takes less than a minute.",
+      "This is where you create tasks, purchase points and approve tasks submissions. Let's walk through the essentials; it takes less than a minute.",
   },
   {
     title: 'Your stats at a glance',
     description:
-      'The three cards up top show how many organisations are pending, verified, or rejected — updated live, no refresh needed.',
+      'The three cards up top show how many tasks submissions are pending, verified, or rejected. Click any card to view the full list of tasks in that category.',
   },
   {
-    title: 'Reviewing new organisations',
+    title: 'Your Points',
     description:
-      'Every pending organisation appears as a card below with their full details. Approve or reject right from the card — rejections let you leave a reason for the organisation.',
+      'View your current points balance and those locked for pending tasks; Purchase more points on the "Purchase Points" button at the top right.',
   },
   {
-    title: 'Tracking every transaction',
+    title: 'Create tasks',
     description:
-      'Use "View Transactions" in the top right any time to see the full points ledger — purchases, escrow moves, and redemptions, all in one place.',
+      'Create tasks for individual participants and community challenges.',
   },
 ]
 

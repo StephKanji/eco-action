@@ -7,7 +7,6 @@ type Org = {
   id: string
   org_name: string
   contact_email: string
-  kra_pin: string
   description: string | null
   verification_status: string
   created_at: string
@@ -49,7 +48,7 @@ export default function OrgApprovalCard({ org }: { org: Org }) {
   }[org.verification_status] ?? 'bg-gray-100 text-gray-600'
 
   return (
-    <div className="bg-white border border-gray-200 backdrop-blur-sm  rounded-xl p-6 space-y-4">
+    <div className="bg-transparent border border-green-500 backdrop-blur-sm  rounded-xl p-3 space-y-3">
 
       {/* Header row */}
       <div className="flex items-start justify-between gap-4">
@@ -64,10 +63,7 @@ export default function OrgApprovalCard({ org }: { org: Org }) {
 
       {/* Details */}
       <div className="grid grid-cols-2 gap-3 text-sm">
-        <div>
-          <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">KRA PIN</p>
-          <p className="text-gray-700 font-mono">{org.kra_pin}</p>
-        </div>
+        
         <div>
           <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Registered</p>
           <p className="text-gray-700">
@@ -101,7 +97,7 @@ export default function OrgApprovalCard({ org }: { org: Org }) {
             value={rejectReason}
             onChange={e => setRejectReason(e.target.value)}
             rows={2}
-            placeholder="e.g. Invalid KRA PIN..."
+            placeholder="e.g. Description does not match and align with our goals and values"
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
           />
         </div>
@@ -113,7 +109,7 @@ export default function OrgApprovalCard({ org }: { org: Org }) {
           <button
             onClick={handleApprove}
             disabled={isPending}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 rounded-lg disabled:opacity-50 transition-colors"
+            className="flex-1 bg-green-50 hover:bg-green-100 text-green-600 border border-green-200 text-sm font-medium py-2 rounded-lg disabled:opacity-50 transition-colors"
           >
             {isPending ? 'Saving...' : '✅ Approve'}
           </button>

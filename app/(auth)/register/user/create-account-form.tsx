@@ -91,7 +91,7 @@ export default function CreateAccountForm() {
   }
 
   return (
-    <div className="hero-section pt-30">
+    <div className="hero-section pt-5">
 
       <div>
         <h1 className="hero-title" style={{ fontSize: 'clamp(1.6rem, 3vw, 3.0rem)', marginBottom: '6px' }}>

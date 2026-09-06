@@ -3,14 +3,14 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
-const TYPE_LABELS: Record<string, { label: string; color: string; sign: string }> = {
-  purchase:       { label: 'Points Purchase',  color: 'text-blue-600',   sign: '+' },
-  starter_grant:  { label: 'Starter Grant',    color: 'text-green-600',  sign: '+' },
-  escrow_lock:    { label: 'Escrow Locked',    color: 'text-orange-500', sign: '-' },
-  escrow_release: { label: 'Task Reward',      color: 'text-green-600',  sign: '+' },
-  escrow_return:  { label: 'Escrow Returned',  color: 'text-blue-500',   sign: '+' },
-  reward_credit:  { label: 'Reward Credit',    color: 'text-green-600',  sign: '+' },
-  redemption:     { label: 'Redemption',       color: 'text-red-500',    sign: '-' },
+const TYPE_LABELS: Record<string, { label: string; color: string }> = {
+  purchase:       { label: 'Points Purchase',  color: 'text-blue-600' },
+  starter_grant:  { label: 'Starter Grant',    color: 'text-green-600' },
+  escrow_lock:    { label: 'Escrow Locked',    color: 'text-orange-500' },
+  escrow_release: { label: 'Task Reward',      color: 'text-green-600' },
+  escrow_return:  { label: 'Escrow Returned',  color: 'text-blue-500' },
+  reward_credit:  { label: 'Reward Credit',    color: 'text-green-600' },
+  redemption:     { label: 'Redemption',       color: 'text-red-500' },
 }
 
 export default async function TransactionHistoryPage() {
@@ -42,11 +42,8 @@ export default async function TransactionHistoryPage() {
 
       {/* Header */}
       <div className="mb-6">
-        <Link href="/profile" className="text-sm text-gray-500 hover:text-gray-700">
-          ← Back to Profile
-        </Link>
         <h1 className="text-2xl font-bold text-gray-900 mt-2">
-          Transaction History
+          Tasks History
         </h1>
         <p className="text-sm text-gray-500 mt-1">
           {transactions?.length ?? 0} transactions
@@ -67,7 +64,6 @@ export default async function TransactionHistoryPage() {
             const meta = TYPE_LABELS[tx.type] ?? {
               label: tx.type,
               color: 'text-gray-600',
-              sign: '•',
             }
 
             // Determine if this is a credit or debit for this user
@@ -86,19 +82,19 @@ export default async function TransactionHistoryPage() {
             return (
               <div
                 key={tx.id}
-                className="flex items-center justify-between p-4 rounded-2xl
-                           bg-white border border-gray-100 shadow-sm"
+                className="flex items-center justify-between p-4 
+                           bg-transparent border border-green-500"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center
+                  <div className="w-1 h-1 rounded-xl bg-gray-50 flex items-center
                                   justify-center text-xl shrink-0">
-                    {tx.type === 'escrow_release' && '🎯'}
-                    {tx.type === 'starter_grant'  && '🎁'}
-                    {tx.type === 'purchase'        && '💳'}
-                    {tx.type === 'escrow_lock'     && '🔒'}
-                    {tx.type === 'escrow_return'   && '↩️'}
-                    {tx.type === 'redemption'      && '🛍️'}
-                    {tx.type === 'reward_credit'   && '⭐'}
+                    {tx.type === 'escrow_release' }
+                    {tx.type === 'starter_grant' }
+                    {tx.type === 'purchase'        }
+                    {tx.type === 'escrow_lock'     }
+                    {tx.type === 'escrow_return'   }
+                    {tx.type === 'redemption'     }
+                    {tx.type === 'reward_credit'   }
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-900">

@@ -14,24 +14,13 @@ const CATEGORY_LABELS: Record<string, string> = {
   other:              '🌍 Other',
 }
 
-const UNIT_LABELS: Record<string, string> = {
-  trees:           'trees',
-  kg_waste:        'kg waste',
-  kg_plastic:      'kg plastic',
-  kwh_saved:       'kwh saved',
-  litres_saved:    'litres saved',
-  tasks_completed: 'tasks',
-}
-
 interface Challenge {
   id: string
   title: string
   description: string
   category: string
-  target_value: number
-  target_unit: string
-  current_progress: number
   reward_pool: number
+  proof_type: string
   participant_count: number
   start_date: string
   end_date: string
@@ -82,6 +71,24 @@ export default function ChallengeDetailPage() {
   const [joining,        setJoining]         = useState(false)
   const [formError,      setFormError]       = useState('')
   const [successMsg,     setSuccessMsg]      = useState('')
+  const [gpsLocation, setGpsLocation] = useState<{ lat: number; lng: number } | null>(null)
+  const [gpsError, setGpsError] = useState('')
+  const [capturingLocation, setCapturingLocation] = useState(false)
+
+  function captureLocation() {
+    setGpsError('')
+    setCapturingLocation(true)
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setGpsLocation({ lat: position.coords.latitude, lng: position.coords.longitude })
+        setCapturingLocation(false)
+      },
+      () => {
+        setGpsError('Could not get your location. Please enable location access and try again.')
+        setCapturingLocation(false)
+      }
+    )
+  }
 
   // ── Fetch data ───────────────────────────────────────────
   const fetchAll = useCallback(async () => {
@@ -94,8 +101,7 @@ export default function ChallengeDetailPage() {
       .from('community_challenges')
       .select(`
         id, title, description, category,
-        target_value, target_unit, current_progress,
-        reward_pool, participant_count,
+        reward_pool, proof_type, participant_count,
         start_date, end_date, status, cover_image_url,
         organizations (org_name)
       `)
@@ -103,19 +109,6 @@ export default function ChallengeDetailPage() {
       .single()
 
     setChallenge(ch as unknown as Challenge)
-
-    // Leaderboard
-    const { data: parts } = await supabase
-      .from('challenge_participants')
-      .select(`
-        user_id, contribution_value, points_earned,
-        profiles (display_name)
-      `)
-      .eq('challenge_id', id)
-      .order('contribution_value', { ascending: false })
-      .limit(20)
-
-    setParticipants((parts ?? []) as unknown as Participant[])
 
     // Has user joined?
     const { data: myRow } = await supabase
@@ -140,25 +133,6 @@ export default function ChallengeDetailPage() {
   }, [id])
 
   useEffect(() => { fetchAll() }, [fetchAll])
-
-  // ── Realtime: live leaderboard updates ───────────────────
-  useEffect(() => {
-    const channel = supabase
-      .channel(`challenge-participants:${id}`)
-      .on(
-        'postgres_changes',
-        {
-          event:  '*',
-          schema: 'public',
-          table:  'challenge_participants',
-          filter: `challenge_id=eq.${id}`,
-        },
-        () => fetchAll()
-      )
-      .subscribe()
-
-    return () => { supabase.removeChannel(channel) }
-  }, [id, fetchAll])
 
   // ── Join challenge ───────────────────────────────────────
   async function handleJoin() {
@@ -187,22 +161,28 @@ export default function ChallengeDetailPage() {
   async function handleSubmit() {
     setFormError('')
 
-    if (!proofFile) { setFormError('Please attach a proof image'); return }
+    if (challenge!.proof_type === 'gps_checkin') {
+      if (!gpsLocation) { setFormError('Please check in with your location first'); return }
+    } else {
+      if (!proofFile) { setFormError('Please attach a proof image'); return }
+    }
     if (contribution <= 0) { setFormError('Contribution must be greater than 0'); return }
 
     setSubmitting(true)
 
     const formData = new FormData()
-    formData.append('proof', proofFile)
+    if (proofFile) formData.append('proof', proofFile)
     formData.append('data', JSON.stringify({
-      challenge_id:   id,
+      challenge_id: id,
       contribution,
       proof_metadata: { notes: notes || undefined },
+      submitted_lat: gpsLocation?.lat,
+      submitted_lng: gpsLocation?.lng,
     }))
 
-    const res  = await fetch('/api/challenges/submit', {
+    const res = await fetch('/api/challenges/submit', {
       method: 'POST',
-      body:   formData,
+      body: formData,
     })
     const data = await res.json()
 
@@ -211,6 +191,7 @@ export default function ChallengeDetailPage() {
     } else {
       setShowSubmitForm(false)
       setProofFile(null)
+      setGpsLocation(null)
       setNotes('')
       setContribution(1)
       setSuccessMsg('Submission received! The organiser will review it shortly.')
@@ -234,7 +215,7 @@ export default function ChallengeDetailPage() {
     <div className="text-center py-20">
       <p className="text-gray-500">Challenge not found.</p>
       <Link href="/challenges" className="text-green-600 text-sm mt-2 inline-block">
-        ← Back to challenges
+         Back to challenges
       </Link>
     </div>
   )
@@ -243,14 +224,10 @@ export default function ChallengeDetailPage() {
   const isActive    = challenge.status === 'active'
   const isUpcoming  = challenge.status === 'upcoming'
   const isCompleted = ['completed', 'failed'].includes(challenge.status)
-  const progressPct = Math.min(
-    Math.round((Number(challenge.current_progress) / Number(challenge.target_value)) * 100),
-    100
-  )
   const endDate     = new Date(challenge.end_date)
   const daysLeft    = Math.ceil((endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-  const unitLabel   = UNIT_LABELS[challenge.target_unit] ?? challenge.target_unit
   const myRank      = participants.findIndex(p => p.user_id === userId) + 1
+  const hasPendingSubmission = mySubmissions.some(s => s.status === 'pending')
 
   return (
     <div className="space-y-5 max-w-2xl mx-auto">
@@ -261,7 +238,7 @@ export default function ChallengeDetailPage() {
         className="inline-flex items-center gap-1 text-sm text-gray-400
                    hover:text-gray-600 transition-colors"
       >
-        ← All Challenges
+       All Challenges
       </Link>
 
       {/* ── Cover image ───────────────────────────────── */}
@@ -276,7 +253,7 @@ export default function ChallengeDetailPage() {
       )}
 
       {/* ── Header card ───────────────────────────────── */}
-      <div className="card space-y-4">
+      <div className=" space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs text-gray-400">{org?.org_name ?? 'Organisation'}</p>
@@ -286,10 +263,10 @@ export default function ChallengeDetailPage() {
             ${isActive    ? 'bg-green-100 text-green-700'  : ''}
             ${isUpcoming  ? 'bg-purple-100 text-purple-700': ''}
             ${isCompleted ? 'bg-gray-100 text-gray-500'    : ''}`}>
-            {isActive    ? '🟢 Active'    : ''}
-            {isUpcoming  ? '🕐 Upcoming'  : ''}
-            {challenge.status === 'completed' ? '✅ Completed' : ''}
-            {challenge.status === 'failed'    ? '❌ Ended'     : ''}
+            {isActive    ? ' Active'    : ''}
+            {isUpcoming  ? ' Upcoming'  : ''}
+            {challenge.status === 'completed' ? ' Completed' : ''}
+            {challenge.status === 'failed'    ? ' Ended'     : ''}
           </span>
         </div>
 
@@ -322,32 +299,6 @@ export default function ChallengeDetailPage() {
         </div>
       </div>
 
-      {/* ── Progress ──────────────────────────────────── */}
-      {!isUpcoming && (
-        <div className="card space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-gray-700">Community Progress</h2>
-            <span className="text-sm font-bold text-green-600">{progressPct}%</span>
-          </div>
-
-          <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full bg-green-500 transition-all duration-700"
-              style={{ width: `${progressPct}%` }}
-            />
-          </div>
-
-          <div className="flex justify-between text-xs text-gray-400">
-            <span>
-              {Number(challenge.current_progress).toLocaleString()} {unitLabel}
-            </span>
-            <span>
-              Goal: {Number(challenge.target_value).toLocaleString()} {unitLabel}
-            </span>
-          </div>
-        </div>
-      )}
-
       {/* ── Feedback messages ─────────────────────────── */}
       {formError && (
         <div className="p-3 rounded-xl bg-red-50 border border-red-200">
@@ -362,7 +313,7 @@ export default function ChallengeDetailPage() {
 
       {/* ── Join / Submit CTA ─────────────────────────── */}
       {isActive && (
-        <div className="card space-y-3">
+        <div className=" space-y-3">
           {!hasJoined ? (
             <>
               <h2 className="text-sm font-semibold text-gray-700">Join this challenge</h2>
@@ -385,29 +336,30 @@ export default function ChallengeDetailPage() {
             </>
           ) : (
             <>
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-gray-700">Your Participation</h2>
-                {myRank > 0 && (
-                  <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 font-medium">
-                    #{myRank} on leaderboard
-                  </span>
-                )}
-              </div>
-
               {!showSubmitForm ? (
-                <button
-                  onClick={() => setShowSubmitForm(true)}
-                  className="w-full py-3 rounded-xl bg-green-600 text-white text-sm
-                             font-semibold hover:bg-green-700 transition-colors"
-                >
-                  📸 Submit Contribution
-                </button>
+                hasPendingSubmission ? (
+                  <button
+                    disabled
+                    className="w-full py-3 rounded-xl bg-yellow-50 text-yellow-600 text-sm
+                               font-semibold cursor-not-allowed border border-yellow-200"
+                  >
+                    Submission Pending Review
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setShowSubmitForm(true)}
+                    className="w-full py-3 rounded-xl bg-green-600 text-white text-sm
+                               font-semibold hover:bg-green-700 transition-colors"
+                  >
+                    Submit Contribution
+                  </button>
+                )
               ) : (
                 <div className="space-y-4 pt-1">
                   {/* Contribution amount */}
                   <div>
                     <label className="label">
-                      Your contribution ({unitLabel})
+                      Your contribution
                     </label>
                     <input
                       type="number"
@@ -417,48 +369,82 @@ export default function ChallengeDetailPage() {
                       value={contribution}
                       onChange={e => setContribution(parseFloat(e.target.value) || 0)}
                     />
-                    <p className="text-xs text-gray-400 mt-1">
-                      How much are you contributing toward the {Number(challenge.target_value).toLocaleString()} {unitLabel} goal?
-                    </p>
                   </div>
 
-                  {/* Proof image */}
-                  <div>
-                    <label className="label">Proof Image</label>
-                    {proofFile ? (
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-green-50
-                                      border border-green-200">
-                        <span className="text-green-600">📷</span>
-                        <span className="text-sm text-green-700 flex-1 truncate">
-                          {proofFile.name}
-                        </span>
+                  {/* Proof */}
+                  {challenge.proof_type === 'gps_checkin' ? (
+                    <div>
+                      <label className="label">Location Check-in</label>
+                      {gpsLocation ? (
+                        <div className="flex items-center gap-3 p-3 rounded-xl bg-green-50 border border-green-200">
+                          <span className="text-green-600">📍</span>
+                          <span className="text-sm text-green-700 flex-1">
+                            {gpsLocation.lat.toFixed(5)}, {gpsLocation.lng.toFixed(5)}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setGpsLocation(null)}
+                            className="text-xs text-gray-400 hover:text-red-500"
+                          >
+                            Reset
+                          </button>
+                        </div>
+                      ) : (
                         <button
                           type="button"
-                          onClick={() => setProofFile(null)}
-                          className="text-xs text-gray-400 hover:text-red-500"
+                          onClick={captureLocation}
+                          disabled={capturingLocation}
+                          className="w-full h-24 flex flex-col items-center justify-center gap-1
+                                     rounded-xl border-2 border-dashed border-gray-200
+                                     hover:border-green-300 hover:bg-green-50 transition-all
+                                     disabled:opacity-50"
                         >
-                          Remove
+                          <span className="text-xl">📍</span>
+                          <span className="text-xs text-gray-500">
+                            {capturingLocation ? 'Getting your location...' : 'Tap to check in with GPS'}
+                          </span>
                         </button>
-                      </div>
-                    ) : (
-                      <label className="flex flex-col items-center justify-center h-24
-                                        rounded-xl border-2 border-dashed border-gray-200
-                                        cursor-pointer hover:border-green-300 hover:bg-green-50
-                                        transition-all">
-                        <span className="text-xl mb-1">📸</span>
-                        <span className="text-xs text-gray-500">Tap to attach proof photo</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const f = e.target.files?.[0]
-                            if (f) setProofFile(f)
-                          }}
-                        />
-                      </label>
-                    )}
-                  </div>
+                      )}
+                      {gpsError && <p className="text-xs text-red-500 mt-1">{gpsError}</p>}
+                    </div>
+                  ) : (
+                    <div>
+                      <label className="label">Proof Image</label>
+                      {proofFile ? (
+                        <div className="flex items-center gap-3 p-3 rounded-xl bg-green-50
+                                        border border-green-200">
+                          <span className="text-green-600">📷</span>
+                          <span className="text-sm text-green-700 flex-1 truncate">
+                            {proofFile.name}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setProofFile(null)}
+                            className="text-xs text-gray-400 hover:text-red-500"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center h-24
+                                          rounded-xl border-2 border-dashed border-gray-200
+                                          cursor-pointer hover:border-green-300 hover:bg-green-50
+                                          transition-all">
+                          <span className="text-xl mb-1">📸</span>
+                          <span className="text-xs text-gray-500">Tap to attach proof photo</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={e => {
+                              const f = e.target.files?.[0]
+                              if (f) setProofFile(f)
+                            }}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  )}
 
                   {/* Notes */}
                   <div>
@@ -501,6 +487,42 @@ export default function ChallengeDetailPage() {
         </div>
       )}
 
+      {isCompleted && hasJoined && (
+        <div className="pt-1">
+          <p className="text-sm text-gray-500 font-medium">
+             This challenge has ended.
+          </p>
+        </div>
+      )}
+
+      {/* ── Join CTA for upcoming challenges ──────────── */}
+      {isUpcoming && !hasJoined && (
+        <div className="card space-y-3">
+          <h2 className="text-sm font-semibold text-gray-700">Get ready — join early</h2>
+          <p className="text-xs text-gray-400">
+            This challenge hasn't started yet, but you can join now to be ready when it opens.
+            Submissions unlock once the challenge goes live.
+          </p>
+          <button
+            onClick={handleJoin}
+            disabled={joining}
+            className="w-full py-3 rounded-xl bg-green-600 text-white text-sm
+                       font-semibold hover:bg-green-700 transition-colors
+                       disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {joining ? 'Joining...' : '🤝 Join Challenge'}
+          </button>
+        </div>
+      )}
+
+      {isUpcoming && hasJoined && (
+        <div className="card">
+          <p className="text-sm text-green-700 font-medium">
+           You're in! Submissions open once this challenge goes live.
+          </p>
+        </div>
+      )}
+
       {/* ── My Submissions ────────────────────────────── */}
       {mySubmissions.length > 0 && (
         <div className="card space-y-3">
@@ -514,7 +536,7 @@ export default function ChallengeDetailPage() {
               >
                 <div>
                   <p className="text-sm font-medium text-gray-800">
-                    +{sub.contribution} {unitLabel}
+                    +{sub.contribution}
                   </p>
                   <p className="text-xs text-gray-400 mt-0.5">
                     {new Date(sub.submitted_at).toLocaleDateString('en-KE', {
@@ -533,55 +555,14 @@ export default function ChallengeDetailPage() {
           </div>
         </div>
       )}
-
-      {/* ── Live Leaderboard ──────────────────────────── */}
-      <div className="card space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-gray-700">Leaderboard</h2>
-          <span className="text-xs text-gray-400">Live · Top 20</span>
-        </div>
-
-        {participants.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-4">
-            No contributions yet — be the first!
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {participants.map((p, i) => {
-              const isMe   = p.user_id === userId
-              const medal  = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`
-              const name   = (p.profiles as any)?.display_name ?? 'Eco Warrior'
-
-              return (
-                <div
-                  key={p.user_id}
-                  className={`flex items-center gap-3 p-3 rounded-xl transition-colors
-                    ${isMe
-                      ? 'bg-green-50 border border-green-200'
-                      : 'bg-gray-50 border border-gray-100'}`}
-                >
-                  <span className="text-sm w-8 text-center shrink-0">{medal}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium truncate
-                      ${isMe ? 'text-green-700' : 'text-gray-800'}`}>
-                      {name} {isMe && <span className="text-xs text-green-500">(you)</span>}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {Number(p.contribution_value).toLocaleString()} {unitLabel}
-                    </p>
-                  </div>
-                  {p.points_earned > 0 && (
-                    <span className="text-xs font-semibold text-green-600 shrink-0">
-                      +{p.points_earned} pts
-                    </span>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-
+      <Link
+        href={`/usertasks`}
+        className="text-sm text-gray-500 hover:text-gray-700"
+      >
+        Explore more Tasks
+      </Link>
     </div>
+    
   )
+  
 }

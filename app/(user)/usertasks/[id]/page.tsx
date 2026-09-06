@@ -39,9 +39,9 @@ export default async function TaskDetailPage({
   )  
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8"> 
+    <div className="max-w-2xl mx-auto pt-2"> 
 
-      <div className="mt-30 space-y-6">
+      <div className="mt-5 space-y-6">
 
         {/* Header */}
         <div>

@@ -307,6 +307,29 @@
     }
   }
 
+  /* ── Navbar / buttons — small phones ── */
+  @media (max-width: 480px) {
+    .hero-header {
+      padding: 0 12px;
+    }
+
+    .btn-ghost {
+      padding: 7px 14px;
+      font-size: 0.82rem;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .hero-header {
+      padding: 0 10px;
+    }
+
+    .btn-ghost {
+      padding: 6px 11px;
+      font-size: 0.78rem;
+    }
+  }
+
 
   /* ── Page layout helpers ── */
 
@@ -397,6 +420,37 @@
     animation: heroFadeUp 0.8s 0.3s ease both;
   }
 
+  /* ── Hero section — mobile ── */
+  @media (max-width: 640px) {
+    .hero-section {
+      padding-top: calc(var(--navbar-h) + 24px);
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    .hero-title {
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+
+    .hero-subtitle {
+      font-size: 0.95rem;
+      max-width: 320px;
+      line-height: 1.6;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .hero-section {
+      padding-top: calc(var(--navbar-h) + 16px);
+    }
+
+    .hero-subtitle {
+      font-size: 0.9rem;
+      max-width: 280px;
+    }
+  }
+
   /* Inner page heading scale */
   .page-title {
     font-size: clamp(1.5rem, 3vw, 2rem);
@@ -481,7 +535,7 @@
   /* Stat card — a simple number + label block */
   .stat-card {
     @apply rounded-xl p-5;
-    background-color: white;
+    background-color: transparent;
     border: 1px solid var(--cream-border);
     box-shadow: var(--shadow-card);
   }
@@ -500,6 +554,24 @@
     color: var(--color-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.6px;
+  }
+
+  /* ── Cards / stat cards — mobile ── */
+  @media (max-width: 640px) {
+    .card,
+    .card-strong,
+    .stat-card {
+      padding: 16px;
+      border-radius: 14px;
+    }
+
+    .stat-card-value {
+      font-size: 1.5rem;
+    }
+
+    .stat-card-label {
+      font-size: 0.72rem;
+    }
   }
 
 
@@ -1175,6 +1247,28 @@
     background: #15803d;
   }
 
+  /* ── Tour card — mobile ── */
+  @media (max-width: 480px) {
+    .tour-card {
+      padding: 22px 18px 16px;
+      border-radius: 14px;
+    }
+
+    .tour-title {
+      font-size: 16px;
+    }
+
+    .tour-description {
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .tour-next-btn {
+      padding: 7px 16px;
+      font-size: 13px;
+    }
+  }
+
   /* ── Admin dropdown filter ── */
   .admin-filter-select {
     appearance: none;
@@ -1219,6 +1313,20 @@
 
   .admin-stat-card.active {
     border-color: currentColor;
+  }
+
+  /* ── Admin filter / stat card — mobile ── */
+  @media (max-width: 640px) {
+    .admin-filter-select {
+      font-size: 0.8rem;
+      padding: 7px 32px 7px 12px;
+      width: 100%;
+    }
+
+    .admin-stat-card {
+      padding: 14px 12px;
+      border-radius: 14px;
+    }
   }
 
   /* ── Org Overview Page (new — append inside @layer components) ── */
@@ -1354,6 +1462,43 @@
 
   .org-checklist-sub {
     font-size: 0.7rem;
+  }
+}
+
+/* ── Mobile ≤ 380px ── */
+@media (max-width: 380px) {
+  .org-header-card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .org-status-pill {
+    font-size: 0.66rem;
+    padding: 5px 10px;
+  }
+
+  .org-checklist {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .org-checklist-item {
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  .org-checklist-check {
+    width: 18px;
+    height: 18px;
+    font-size: 0.6rem;
+  }
+
+  .org-checklist-title {
+    font-size: 0.75rem;
+  }
+
+  .org-checklist-sub {
+    font-size: 0.66rem;
   }
 }
 }

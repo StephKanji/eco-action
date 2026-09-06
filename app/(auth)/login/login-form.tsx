@@ -56,7 +56,7 @@ export default function LoginForm() {
           zIndex: 1,
         }} />
 
-        <div className='hero-section'>
+        <div className='hero-section pt-5'>
 
           <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', marginBottom: '8px' }}>
             Login To Your Account; <em>let's heal the planet.</em>

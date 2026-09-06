@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       .select(`
         id, status, user_id, contribution, challenge_id,
         community_challenges!inner (
-          id, org_id, status
+          id, org_id, status, end_date
         )
       `)
       .eq('id', submission_id)
@@ -78,13 +78,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // ── Check challenge is still active ──────────────────────
-    if (challenge.status !== 'active') {
-      return NextResponse.json(
-        { error: 'Challenge is no longer active' },
-        { status: 400 }
-      )
-    }
+   
 
     // ── Update submission status ─────────────────────────────
     const { error: updateError } = await adminClient

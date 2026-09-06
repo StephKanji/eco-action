@@ -1,4 +1,4 @@
-// lib/queries/org-tasks.ts
+
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export type OrgTask = {
