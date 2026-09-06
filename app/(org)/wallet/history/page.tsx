@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
-import TransactionHistoryView from './transaction-history-view'
+import TransactionHistoryView from '../../../../components/transactions/transaction-history-view'
 
 export default async function TransactionHistoryPage() {
   const supabase = await createClient()
