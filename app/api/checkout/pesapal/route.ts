@@ -6,6 +6,8 @@ import { NextResponse } from 'next/server'
 import { randomUUID } from 'crypto'
 
 export async function POST(request: Request) {
+  const origin = new URL(request.url).origin
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
@@ -64,13 +66,16 @@ export async function POST(request: Request) {
     currency: 'KES',
     amount: pkg.price_kes,
     description: `${pkg.name} — ${pkg.points.toLocaleString()} points`,
-    callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/wallet?pesapal_return=true`,
+    // Built from the actual incoming request's origin instead of a static
+    // env var — this way it's correct whether we're behind ngrok in local
+    // dev or on the real domain in production, with no manual switching.
+    callback_url: `${origin}/wallet?pesapal_return=true`,
     billing_address: {
       email_address: org.contact_email,
       phone_number: '254700000000', // sandbox dummy number — replace with a real org phone field later
       country_code: 'KE',
       first_name: org.org_name,
-        },
+    },
   })
 
   if (result.error) {
