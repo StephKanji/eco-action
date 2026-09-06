@@ -451,6 +451,18 @@
     }
   }
 
+  @media print {
+    .no-print{
+      display: none !important;
+    }
+    body{
+      background-color: white !important;
+      color: black !important;}
+      table{
+        font-size: 11px;
+      }
+    }
+
   /* Inner page heading scale */
   .page-title {
     font-size: clamp(1.5rem, 3vw, 2rem);

@@ -117,7 +117,7 @@ export default async function OrgOverviewPage() {
 
           {/* Points row */}
           <div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <div className="stat-card">
                 <p className="stat-card-value">{org.points_balance.toLocaleString()}</p>
                 <p className="stat-card-label">Your Available Points</p>
@@ -126,7 +126,14 @@ export default async function OrgOverviewPage() {
                 <p className="stat-card-value">{org.escrow_balance.toLocaleString()}</p>
                 <p className="stat-card-label">Locked for Tasks</p>
               </div>
-      
+              <Link href="/wallet/history" className="card-strong">
+                <div className="flex items-center gap-3">
+                  <div>
+                    <p className="font-semibold text-white">View Transactions</p>
+                    <p className="text-xs text-white/70 mt-0.5">Keep Track of point transactions</p>
+                  </div>
+                </div>
+              </Link>
             </div>
           </div>
 
